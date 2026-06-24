@@ -113,7 +113,7 @@ export function StoreList({ prefectureCode }: Props) {
       if (next.has(storeId)) next.delete(storeId);
       else next.add(storeId);
       try {
-        localStorage.setItem('timelesz-favorites', JSON.stringify([...next]));
+        localStorage.setItem('timelesz-favorites', JSON.stringify(Array.from(next)));
       } catch {}
       return next;
     });
