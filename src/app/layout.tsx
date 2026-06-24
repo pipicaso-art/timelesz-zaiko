@@ -4,21 +4,30 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'timelesz在庫チェッカー',
   description:
-    '【ファンサイト】timelesz「消えない花火」の全国CDショップ在庫状況をファン同士で更新・共有できます。',
+    '発売されるtimeleszのCD在庫状況を全国のファンで共有！みんなで作るファンサイトです',
   keywords: 'timelesz,在庫チェッカー,CD在庫,消えない花火',
   themeColor: '#ffffff',
   openGraph: {
     title: 'timelesz在庫チェッカー',
     description:
-      '【ファンサイト】timelesz「消えない花火」の全国CDショップ在庫状況をファン同士で更新・共有できます。',
+      '発売されるtimeleszのCD在庫状況を全国のファンで共有！みんなで作るファンサイトです',
     type: 'website',
     locale: 'ja_JP',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'timelesz在庫チェッカー',
+      },
+    ],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'timelesz在庫チェッカー',
     description:
-      '【ファンサイト】timelesz「消えない花火」の全国CDショップ在庫状況をファン同士で更新・共有できます。',
+      '発売されるtimeleszのCD在庫状況を全国のファンで共有！みんなで作るファンサイトです',
+    images: ['/og-image.png'],
   },
 };
 
