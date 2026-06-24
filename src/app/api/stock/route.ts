@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const supabase = createClient<any>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+export const dynamic = 'force-dynamic';
+
+function getSupabase() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return createClient<any>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 // GET /api/stock?prefecture=tokyo
 export async function GET(request: NextRequest) {
+  const supabase = getSupabase();
   const { searchParams } = new URL(request.url);
   const prefecture = searchParams.get('prefecture');
 
@@ -30,7 +35,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ stores: [], stock: {} });
   }
 
-  const storeIds = stores.map((s) => s.id);
+  const storeIds = stores.map((s: { id: string }) => s.id);
 
   // Get latest stock for each store and edition
   const { data: stockData, error: stockError } = await supabase
@@ -60,6 +65,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/stock
 export async function POST(request: NextRequest) {
+  const supabase = getSupabase();
   const body = await request.json();
   const { store_id, edition, quantity_range, note } = body;
 
