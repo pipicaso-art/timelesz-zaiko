@@ -5,7 +5,6 @@ import { getPrefectureByCode } from '@/data/prefectures';
 import { Sidebar } from '@/components/Sidebar';
 import { StoreList } from './StoreList';
 
-export const runtime = 'edge';
 
 interface Props {
   params: Promise<{ prefecture: string }>;
@@ -58,11 +57,4 @@ export default async function PrefecturePage({ params }: Props) {
           みんなで在庫情報を共有しましょう ✨
         </div>
 
-        {/* 店舗リスト */}
-        <StoreList prefectureCode={prefecture} />
-      </div>
-
-      <Sidebar />
-    </main>
-  );
-}
+        {/* 店舗リスト *

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
 
 const SUPABASE_URL = 'https://mxplxvthjtxbxehigpki.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq';
@@ -24,5 +23,4 @@ export async function GET() {
   }
 
   const data = await res.json();
-  return NextResponse.json({ updates: data });
-}
+  return 

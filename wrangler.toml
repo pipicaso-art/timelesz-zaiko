@@ -1,8 +1,8 @@
 name = "timelesz-zaiko"
-compatibility_date = "2024-01-01"
+main = ".open-next/worker.js"
+compatibility_date = "2024-12-30"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".vercel/output/static"
 
-[vars]
-NEXT_PUBLIC_SUPABASE_URL = "https://mxplxvthjtxbxehigpki.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq"
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
 
 const SUPABASE_URL = 'https://mxplxvthjtxbxehigpki.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq';
@@ -30,11 +29,4 @@ export async function GET() {
 
     return NextResponse.json(data[0]);
   } catch {
-    return NextResponse.json({
-      billboard_count: 0,
-      own_count: 0,
-      target: 500000,
-      updated_at: new Date().toISOString(),
-    });
-  }
-}
+    r
