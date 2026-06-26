@@ -309,15 +309,27 @@ export function StoreList({ prefectureCode }: Props) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-bold text-gray-900 text-sm">{store.name}</h3>
-                      <span
-                        className={`inline-block rounded px-2 py-0.5 text-xs font-bold ${
-                          bestRange !== 'unknown'
-                            ? STOCK_RANGE_COLORS[bestRange]
-                            : 'bg-gray-100 text-gray-500'
-                        }`}
-                      >
-                        {bestRange !== 'unknown' ? STOCK_RANGE_LABELS[bestRange] : '未更新'}
-                      </span>
+                      {/* オリコン/Billboardアイコン */}
+                      {store.oricon && (
+                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-100 text-orange-700 border border-orange-200 leading-none">
+                          <svg className="w-2.5 h-2.5" viewBox="0 0 12 12" fill="currentColor">
+                            <rect x="1" y="6" width="2" height="5" rx="0.5"/>
+                            <rect x="4.5" y="3.5" width="2" height="7.5" rx="0.5"/>
+                            <rect x="8" y="1" width="2" height="10" rx="0.5"/>
+                          </svg>
+                          オリコン
+                        </span>
+                      )}
+                      {store.billboard && (
+                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200 leading-none">
+                          <svg className="w-2.5 h-2.5" viewBox="0 0 12 12" fill="currentColor">
+                            <rect x="1" y="4" width="2" height="7" rx="0.5"/>
+                            <rect x="4.5" y="2" width="2" height="9" rx="0.5"/>
+                            <rect x="8" y="5" width="2" height="6" rx="0.5"/>
+                          </svg>
+                          Billboard
+                        </span>
+                      )}
                       {/* 距離バッジ */}
                       {sortType === 'distance' && dist != null && (
                         <span className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-1.5 py-0.5">

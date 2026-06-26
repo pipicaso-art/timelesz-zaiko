@@ -44,6 +44,8 @@ export interface Store {
   url?: string;
   latitude?: number | null;
   longitude?: number | null;
+  oricon?: boolean;
+  billboard?: boolean;
   created_at?: string;
 }
 
