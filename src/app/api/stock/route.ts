@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +11,6 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-// GET /api/stock?prefecture=tokyo
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const prefecture = searchParams.get('prefecture');
@@ -59,7 +58,6 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ stores, stock: stockByStore });
 }
 
-// POST /api/stock
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { store_id, edition, quantity_range, note } = body;

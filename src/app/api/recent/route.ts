@@ -1,11 +1,10 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
 const SUPABASE_URL = 'https://mxplxvthjtxbxehigpki.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq';
 
-// GET /api/recent - 最近の更新10件
 export async function GET() {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/stock_updates?select=id,edition,quantity_range,note,created_at,stores(id,name,prefecture,prefecture_code)&order=created_at.desc&limit=10`,
