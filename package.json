@@ -11,9 +11,9 @@
     "preview": "npm run pages:build && wrangler pages dev"
   },
   "dependencies": {
-    "next": "14.2.5",
-    "react": "^18",
-    "react-dom": "^18",
+    "next": "^15.3.2",
+    "react": "^19",
+    "react-dom": "^19",
     "@supabase/supabase-js": "^2.108.2",
     "date-fns": "^3.3.1"
   },
@@ -28,6 +28,6 @@
     "postcss": "^8",
     "autoprefixer": "^10.4.17",
     "eslint": "^8",
-    "eslint-config-next": "14.2.5"
+    "eslint-config-next": "^15.3.2"
   }
 }

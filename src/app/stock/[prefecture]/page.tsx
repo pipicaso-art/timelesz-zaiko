@@ -6,11 +6,12 @@ import { Sidebar } from '@/components/Sidebar';
 import { StoreList } from './StoreList';
 
 interface Props {
-  params: { prefecture: string };
+  params: Promise<{ prefecture: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const pref = getPrefectureByCode(params.prefecture);
+  const { prefecture } = await params;
+  const pref = getPrefectureByCode(prefecture);
   if (!pref) return {};
   return {
     title: `${pref.name}の在庫 | timelesz在庫チェッカー`,
@@ -18,8 +19,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function PrefecturePage({ params }: Props) {
-  const pref = getPrefectureByCode(params.prefecture);
+export default async function PrefecturePage({ params }: Props) {
+  const { prefecture } = await params;
+  const pref = getPrefectureByCode(prefecture);
 
   if (!pref) {
     notFound();
@@ -55,7 +57,7 @@ export default function PrefecturePage({ params }: Props) {
         </div>
 
         {/* 店舗リスト */}
-        <StoreList prefectureCode={params.prefecture} />
+        <StoreList prefectureCode={prefecture} />
       </div>
 
       <Sidebar />
