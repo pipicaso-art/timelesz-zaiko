@@ -91,7 +91,7 @@ export default function HomePage() {
               ✏️ まず練習！
             </a>
             <a
-              href="https://x.com/intent/tweet?text=%23timelesz%E5%9C%A8%E5%BA%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC%20%23TSZ%E5%9C%A8%E5%BA%AB%E6%83%85%E5%A0%B1_%E6%B6%88%E3%81%88%E3%81%AA%E3%81%84%E8%8A%B1%E7%81%AB%20https%3A%2F%2Ftimelesz-zaiko.pages.dev"
+              href="https://x.com/intent/tweet?text=%23timelesz%E5%9C%A8%E5%BA%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC%20%23TSZ%E5%9C%A8%E5%BA%AB%E6%83%85%E5%A0%B1_%E6%B6%88%E3%81%88%E3%81%AA%E3%81%84%E8%8A%B1%E7%81%AB%20https%3A%2F%2Ftimelesz-zaiko-dnik.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white text-sm font-bold px-4 py-2 rounded-full transition-colors"

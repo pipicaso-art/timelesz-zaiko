@@ -1,10 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
-export const runtime = 'edge';
-
 export const metadata: Metadata = {
-  metadataBase: new URL('https://timelesz-zaiko.pages.dev'),
+  metadataBase: new URL('https://timelesz-zaiko-dnik.vercel.app'),
   title: 'timelesz在庫チェッカー',
   description:
     '発売されるtimeleszのCD在庫状況を全国のファンで共有！みんなで作るファンサイトです',
