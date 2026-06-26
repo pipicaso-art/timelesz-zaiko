@@ -1,10 +1,9 @@
-import { notFound } from 'next/navigation';
+﻿import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getPrefectureByCode } from '@/data/prefectures';
 import { Sidebar } from '@/components/Sidebar';
 import { StoreList } from './StoreList';
-
 
 interface Props {
   params: Promise<{ prefecture: string }>;
@@ -57,4 +56,10 @@ export default async function PrefecturePage({ params }: Props) {
           みんなで在庫情報を共有しましょう ✨
         </div>
 
-        {/* 店舗リスト *
+        {/* 店舗リスト */}
+        <StoreList prefecture={pref} />
+      </div>
+      <Sidebar />
+    </main>
+  );
+}
