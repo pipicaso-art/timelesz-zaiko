@@ -1,31 +1,35 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'edge';
 
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://mxplxvthjtxbxehigpki.supabase.co',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq',
-    {
-      global: {
-        fetch: (url, options = {}) => fetch(url, { ...options, cache: 'no-store' }),
-      },
-    }
-  );
-}
+const SUPABASE_URL = 'https://mxplxvthjtxbxehigpki.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq';
 
 export async function GET() {
-  const supabase = getSupabase();
-  const { data, error } = await supabase
-    .from('song_stats')
-    .select('*')
-    .order('id', { ascending: false })
-    .limit(1)
-    .single();
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/song_stats?select=*&order=id.desc&limit=1`,
+      {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        cache: 'no-store',
+      }
+    );
 
-  if (error) {
+    if (!res.ok) {
+      throw new Error(`Supabase error: ${res.status}`);
+    }
+
+    const data = await res.json();
+    if (!data || data.length === 0) {
+      throw new Error('No data');
+    }
+
+    return NextResponse.json(data[0]);
+  } catch {
     return NextResponse.json({
       billboard_count: 0,
       own_count: 0,
@@ -33,6 +37,4 @@ export async function GET() {
       updated_at: new Date().toISOString(),
     });
   }
-
-  return NextResponse.json(data);
 }

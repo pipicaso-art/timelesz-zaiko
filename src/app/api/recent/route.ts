@@ -1,37 +1,28 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'edge';
 
+const SUPABASE_URL = 'https://mxplxvthjtxbxehigpki.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq';
+
 // GET /api/recent - 最近の更新10件
 export async function GET() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabase = createClient<any>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://mxplxvthjtxbxehigpki.supabase.co',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq'
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/stock_updates?select=id,edition,quantity_range,note,created_at,stores(id,name,prefecture,prefecture_code)&order=created_at.desc&limit=10`,
+    {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+      cache: 'no-store',
+    }
   );
-  const { data, error } = await supabase
-    .from('stock_updates')
-    .select(`
-      id,
-      edition,
-      quantity_range,
-      note,
-      created_at,
-      stores (
-        id,
-        name,
-        prefecture,
-        prefecture_code
-      )
-    `)
-    .order('created_at', { ascending: false })
-    .limit(10);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!res.ok) {
+    return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
   }
 
+  const data = await res.json();
   return NextResponse.json({ updates: data });
 }
