@@ -6,8 +6,8 @@ export const runtime = 'edge';
 
 function getSupabase() {
   return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://mxplxvthjtxbxehigpki.supabase.co',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq'
   );
 }
 

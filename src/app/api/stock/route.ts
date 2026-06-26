@@ -7,8 +7,8 @@ export const runtime = 'edge';
 function getSupabase() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return createClient<any>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://mxplxvthjtxbxehigpki.supabase.co',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq'
   );
 }
 
