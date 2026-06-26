@@ -29,4 +29,6 @@ export async function GET() {
 
     return NextResponse.json(data[0]);
   } catch {
-    r
+    return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
+  }
+}

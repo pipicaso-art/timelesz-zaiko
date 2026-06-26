@@ -38,4 +38,14 @@ export async function POST(req: NextRequest) {
 
   const res = await fetch(`${SUPABASE_URL}/rest/v1/comments`, {
     method: 'POST',
-  
+    headers: { ...headers, Prefer: 'return=representation' },
+    body: JSON.stringify({ store_id, text: text.trim() }),
+  });
+
+  if (!res.ok) {
+    return NextResponse.json({ error: 'Failed to post comment' }, { status: 500 });
+  }
+
+  const data = await res.json();
+  return NextResponse.json(data[0] ?? data, { status: 201 });
+}

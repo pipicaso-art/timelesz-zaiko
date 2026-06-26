@@ -83,4 +83,14 @@ export async function POST(request: NextRequest) {
 
   const res = await fetch(`${SUPABASE_URL}/rest/v1/stock_updates`, {
     method: 'POST',
-    headers: { ...headers, Prefer: 'return=representation'
+    headers: { ...headers, Prefer: 'return=representation' },
+    body: JSON.stringify({ store_id, edition, quantity_range, note }),
+  });
+
+  if (!res.ok) {
+    return NextResponse.json({ error: 'Failed to save' }, { status: 500 });
+  }
+
+  const data = await res.json();
+  return NextResponse.json(data[0] ?? data, { status: 201 });
+}
