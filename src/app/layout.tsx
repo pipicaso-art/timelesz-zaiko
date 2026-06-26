@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
+export const runtime = 'edge';
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://timelesz-zaiko-dnik.vercel.app'),
   title: 'timelesz在庫チェッカー',
