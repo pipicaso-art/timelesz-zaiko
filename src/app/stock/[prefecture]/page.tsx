@@ -57,7 +57,7 @@ export default async function PrefecturePage({ params }: Props) {
         </div>
 
         {/* 店舗リスト */}
-        <StoreList prefecture={pref} />
+        <StoreList prefectureCode={pref.code} />
       </div>
       <Sidebar />
     </main>
