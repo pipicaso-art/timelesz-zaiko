@@ -5,6 +5,8 @@ import { getPrefectureByCode } from '@/data/prefectures';
 import { Sidebar } from '@/components/Sidebar';
 import { StoreList } from './StoreList';
 
+export const runtime = 'edge';
+
 interface Props {
   params: Promise<{ prefecture: string }>;
 }
