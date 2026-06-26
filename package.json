@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "preview": "npm run pages:build && wrangler pages dev"
   },
   "dependencies": {
     "next": "14.2.5",
@@ -16,6 +18,8 @@
     "date-fns": "^3.3.1"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1",
+    "wrangler": "^3",
     "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
