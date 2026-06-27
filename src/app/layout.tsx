@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     '発売されるtimeleszのCD在庫状況を全国のファンで共有！みんなで作るファンサイトです',
   keywords: 'timelesz,在庫チェッカー,CD在庫,消えない花火',
-  themeColor: '#ffffff',
+  themeColor: '#2DD4BF',
   openGraph: {
     title: 'timelesz在庫チェッカー',
     description:
@@ -29,6 +29,19 @@ export const metadata: Metadata = {
     description:
       '発売されるtimeleszのCD在庫状況を全国のファンで共有！みんなで作るファンサイトです',
     images: ['/og-image.png'],
+  },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'timelesz在庫チェッカー',
+  },
+  icons: {
+    apple: '/apple-touch-icon.png',
+    icon: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
   },
 };
 
