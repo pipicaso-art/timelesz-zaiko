@@ -1,6 +1,6 @@
 {
   "name": "timelesz在庫チェッカー",
-  "short_name": "tz在庫",
+  "short_name": "TSZ在庫",
   "description": "timelesz「消えない花火」のCD在庫を全国で共有するファンサイト",
   "start_url": "/",
   "display": "standalone",
