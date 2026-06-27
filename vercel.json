@@ -1,0 +1,19 @@
+{
+  "redirects": [
+    {
+      "source": "/stock/:path*",
+      "destination": "https://timelesz-zaiko.pipicaso.workers.dev/stock/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://timelesz-zaiko.pipicaso.workers.dev/api/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/onlinestore",
+      "destination": "https://timelesz-zaiko.pipicaso.workers.dev/onlinestore",
+      "permanent": false
+    }
+  ]
+}

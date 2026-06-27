@@ -1,3 +1,4 @@
+import { MovedPage } from '@/components/MovedPage';
 import { Sidebar } from '@/components/Sidebar';
 import { PrefectureList } from '@/components/PrefectureList';
 import { SalesProgress } from '@/components/SalesProgress';
@@ -11,6 +12,11 @@ function getDaysUntilRelease() {
 }
 
 export default function HomePage() {
+  // Vercel環境では移転案内ページを表示（CPU節約のため）
+  if (process.env.VERCEL === '1') {
+    return <MovedPage />;
+  }
+
   const daysUntil = getDaysUntilRelease();
 
   return (

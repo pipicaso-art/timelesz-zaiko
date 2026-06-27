@@ -155,7 +155,7 @@ export function MemberWalkAnimation() {
       width={800}
       height={72}
       className="w-full"
-      style={{ imageRendering: 'pixelated' }}
+      style={{ imageRendering: 'pixelated', aspectRatio: '800 / 72', height: 'auto' }}
     />
   );
 }
