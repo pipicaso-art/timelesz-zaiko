@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://timelesz-zaiko.pages.dev'),
+  metadataBase: new URL('https://timelesz-zaiko-static.pages.dev'),
   title: 'timelesz在庫チェッカー',
   description: '発売されるtimeleszのCD在庫状況を全国のファンで共有！みんなで作るファンサイトです',
   keywords: 'timelesz,在庫チェッカー,CD在庫,消えない花火',
