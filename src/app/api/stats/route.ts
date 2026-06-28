@@ -27,7 +27,9 @@ export async function GET() {
       throw new Error('No data');
     }
 
-    return NextResponse.json(data[0]);
+    return NextResponse.json(data[0], {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' },
+    });
   } catch {
     return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
   }

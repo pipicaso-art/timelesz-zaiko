@@ -6,6 +6,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { EDITION_LABELS, STOCK_RANGE_LABELS, STOCK_RANGE_COLORS } from '@/types';
 import type { Edition, StockRange } from '@/types';
+import { SUPABASE_URL, SUPABASE_HEADERS } from '@/lib/supabase';
 
 interface RecentUpdate {
   id: string;
@@ -26,25 +27,24 @@ export function RecentUpdates() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/recent')
+    fetch(
+      `${SUPABASE_URL}/rest/v1/stock_updates?select=id,edition,quantity_range,note,created_at,stores(id,name,prefecture,prefecture_code)&order=created_at.desc&limit=10`,
+      { headers: SUPABASE_HEADERS }
+    )
       .then((r) => r.json())
       .then((data) => {
-        setUpdates(data.updates || []);
+        setUpdates(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
   if (loading) {
-    return (
-      <div className="text-gray-400 text-sm animate-pulse">読み込み中...</div>
-    );
+    return <div className="text-gray-400 text-sm animate-pulse">読み込み中...</div>;
   }
 
   if (updates.length === 0) {
-    return (
-      <div className="text-gray-400 text-sm">まだ更新がありません</div>
-    );
+    return <div className="text-gray-400 text-sm">まだ更新がありません</div>;
   }
 
   return (

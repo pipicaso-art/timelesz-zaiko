@@ -1,6 +1,27 @@
-// Supabase REST API direct fetch helper (no SDK - compatible with Cloudflare Edge Runtime)
-const SUPABASE_URL = 'https://mxplxvthjtxbxehigpki.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq';
+// Supabase REST API direct fetch helper (browser-safe, no SDK)
+export const SUPABASE_URL = 'https://mxplxvthjtxbxehigpki.supabase.co';
+export const SUPABASE_ANON_KEY = 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq';
+
+export const SUPABASE_HEADERS = {
+  apikey: SUPABASE_ANON_KEY,
+  Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+  'Content-Type': 'application/json',
+};
+
+export async function supabaseFetch(path: string, options?: RequestInit) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      ...SUPABASE_HEADERS,
+      ...(options?.headers ?? {}),
+    },
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  return res.json();
+}
 
 export async function supabaseGet(table: string, params: Record<string, string> = {}) {
   const url = new URL(`${SUPABASE_URL}/rest/v1/${table}`);
@@ -16,15 +37,7 @@ export async function supabaseGet(table: string, params: Record<string, string> 
     url.searchParams.set(col, `in.(${vals})`);
   }
 
-  const res = await fetch(url.toString(), {
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    cache: 'no-store',
-  });
-
+  const res = await fetch(url.toString(), { headers: SUPABASE_HEADERS });
   if (!res.ok) {
     const err = await res.text();
     return { data: null, error: err };
@@ -36,15 +49,9 @@ export async function supabaseGet(table: string, params: Record<string, string> 
 export async function supabasePost(table: string, body: Record<string, unknown>) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
     method: 'POST',
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=representation',
-    },
+    headers: { ...SUPABASE_HEADERS, Prefer: 'return=representation' },
     body: JSON.stringify(body),
   });
-
   if (!res.ok) {
     const err = await res.text();
     return { data: null, error: err };

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { Store, Edition, StockRange } from '@/types';
 import { EDITION_LABELS, STOCK_RANGE_LABELS } from '@/types';
+import { SUPABASE_URL, SUPABASE_HEADERS } from '@/lib/supabase';
 
 interface Props {
   store: Store;
@@ -24,11 +25,10 @@ export function UpdateModal({ store, onClose, onSuccess }: Props) {
     e.preventDefault();
     setSubmitting(true);
     setError('');
-
     try {
-      const res = await fetch('/api/stock', {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/stock_updates`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...SUPABASE_HEADERS, Prefer: 'return=representation' },
         body: JSON.stringify({
           store_id: store.id,
           edition,
@@ -36,12 +36,10 @@ export function UpdateModal({ store, onClose, onSuccess }: Props) {
           note: note.trim() || null,
         }),
       });
-
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || '更新に失敗しました');
+        throw new Error(data.message || '更新に失敗しました');
       }
-
       onSuccess();
       onClose();
     } catch (err) {
@@ -59,86 +57,44 @@ export function UpdateModal({ store, onClose, onSuccess }: Props) {
       <div className="bg-white border border-gray-200 rounded-xl w-full max-w-md p-6 shadow-xl">
         <h2 className="text-lg font-bold text-gray-900 mb-1">在庫を更新</h2>
         <p className="text-gray-500 text-sm mb-4">{store.name}</p>
-
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 盤種 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              盤種
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">盤種</label>
             <div className="flex gap-2 flex-wrap">
               {EDITIONS.map((ed) => (
-                <button
-                  key={ed}
-                  type="button"
-                  onClick={() => setEdition(ed)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    edition === ed
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
+                <button key={ed} type="button" onClick={() => setEdition(ed)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${edition === ed ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                   {EDITION_LABELS[ed]}
                 </button>
               ))}
             </div>
           </div>
-
-          {/* 在庫数 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              在庫数
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">在庫数</label>
             <div className="flex gap-2 flex-wrap">
               {RANGES.map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => setRange(r)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    range === r
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
+                <button key={r} type="button" onClick={() => setRange(r)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${range === r ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                   {STOCK_RANGE_LABELS[r]}
                 </button>
               ))}
             </div>
           </div>
-
-          {/* メモ */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              メモ（任意）
-            </label>
-            <input
-              type="text"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
+            <label className="block text-sm font-medium text-gray-700 mb-2">メモ（任意）</label>
+            <input type="text" value={note} onChange={(e) => setNote(e.target.value)}
               placeholder="例：通常盤完売、特典付き"
               className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-              maxLength={100}
-            />
+              maxLength={100} />
           </div>
-
-          {error && (
-            <p className="text-red-500 text-sm">{error}</p>
-          )}
-
+          {error && <p className="text-red-500 text-sm">{error}</p>}
           <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
-            >
+            <button type="button" onClick={onClose}
+              className="flex-1 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors">
               キャンセル
             </button>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="flex-1 py-2 rounded-lg bg-emerald-500 text-white text-sm font-bold hover:bg-emerald-600 transition-colors disabled:opacity-50"
-            >
+            <button type="submit" disabled={submitting}
+              className="flex-1 py-2 rounded-lg bg-emerald-500 text-white text-sm font-bold hover:bg-emerald-600 transition-colors disabled:opacity-50">
               {submitting ? '送信中...' : '更新する'}
             </button>
           </div>

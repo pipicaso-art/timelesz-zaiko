@@ -1,16 +1,10 @@
--- Step 1: Add chart flag columns to stores table
+-- Step 1: Add chart flag columns
 ALTER TABLE stores ADD COLUMN IF NOT EXISTS oricon BOOLEAN DEFAULT TRUE;
 ALTER TABLE stores ADD COLUMN IF NOT EXISTS billboard BOOLEAN DEFAULT TRUE;
 
--- Step 2: Add unique constraint on name (needed for ON CONFLICT)
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'stores_name_key') THEN
-    ALTER TABLE stores ADD CONSTRAINT stores_name_key UNIQUE (name);
-  END IF;
-END $$;
-
--- Step 3: Upsert all stores from master data
-INSERT INTO stores (name, prefecture, prefecture_code, oricon, billboard) VALUES
+-- Step 2: Create temp table with import data
+CREATE TEMP TABLE store_import (name text, prefecture text, prefecture_code text, oricon boolean, billboard boolean);
+INSERT INTO store_import VALUES
 ('タワレコ 札幌パルコ店', '北海道', 'hokkaido', true, true),
 ('タワレコ アリオ札幌店', '北海道', 'hokkaido', true, true),
 ('ＨＭＶ 札幌ステラプレイス', '北海道', 'hokkaido', true, true),
@@ -85,7 +79,6 @@ INSERT INTO stores (name, prefecture, prefecture_code, oricon, billboard) VALUES
 ('TSUTAYA ブックエース小名浜住吉店', '福島県', 'fukushima', true, true),
 ('TSUTAYA 会津アピオ店', '福島県', 'fukushima', true, true),
 ('TSUTAYA 上荒川店', '福島県', 'fukushima', true, true),
-('TSUTAYA 須賀川東店', '福島県', 'fukushima', true, true),
 ('TSUTAYA 二本松店', '福島県', 'fukushima', true, true),
 ('TSUTAYA 船引店', '福島県', 'fukushima', true, true),
 ('BOOKACE 植田店', '福島県', 'fukushima', true, true),
@@ -834,9 +827,17 @@ INSERT INTO stores (name, prefecture, prefecture_code, oricon, billboard) VALUES
 ('タワレコ 那覇店', '沖縄県', 'okinawa', true, true),
 ('HMV OKINAWA', '沖縄県', 'okinawa', true, true),
 ('サウンドボックスミツトモ', '沖縄県', 'okinawa', true, false),
-('高良レコード', '沖縄県', 'okinawa', true, false)
-ON CONFLICT (name) DO UPDATE SET
-  oricon = EXCLUDED.oricon,
-  billboard = EXCLUDED.billboard,
-  prefecture = EXCLUDED.prefecture,
-  prefecture_code = EXCLUDED.prefecture_code;
+('高良レコード', '沖縄県', 'okinawa', true, false);
+
+-- Step 3: Insert new stores (skip existing by name)
+INSERT INTO stores (name, prefecture, prefecture_code, oricon, billboard)
+SELECT si.name, si.prefecture, si.prefecture_code, si.oricon, si.billboard
+FROM store_import si
+WHERE NOT EXISTS (SELECT 1 FROM stores s WHERE s.name = si.name);
+
+-- Step 4: Update oricon/billboard for existing stores
+UPDATE stores SET oricon = si.oricon, billboard = si.billboard
+FROM store_import si
+WHERE stores.name = si.name;
+
+DROP TABLE store_import;

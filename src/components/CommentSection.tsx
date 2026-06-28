@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { ja } from 'date-fns/locale';
+import { SUPABASE_URL, SUPABASE_HEADERS } from '@/lib/supabase';
 
 interface Comment {
   id: string;
@@ -22,9 +23,12 @@ export function CommentSection({ storeId }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   async function loadComments() {
-    const res = await fetch(`/api/comments?store_id=${storeId}`);
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/comments?store_id=eq.${storeId}&select=id,text,created_at&order=created_at.desc&limit=50`,
+      { headers: SUPABASE_HEADERS }
+    );
     const data = await res.json();
-    setComments(data.comments || []);
+    setComments(Array.isArray(data) ? data : []);
     setLoading(false);
   }
 
@@ -34,12 +38,13 @@ export function CommentSection({ storeId }: Props) {
 
   async function handleSubmit() {
     if (!text.trim() || submitting) return;
+    if (text.trim().length > 200) return;
     setSubmitting(true);
     try {
-      const res = await fetch('/api/comments', {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/comments`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ store_id: storeId, text }),
+        headers: { ...SUPABASE_HEADERS, Prefer: 'return=representation' },
+        body: JSON.stringify({ store_id: storeId, text: text.trim() }),
       });
       if (res.ok) {
         setText('');
@@ -59,12 +64,9 @@ export function CommentSection({ storeId }: Props) {
 
   return (
     <div className="mt-3 border-t border-gray-100 pt-3">
-      {/* ヘッダー */}
       <p className="text-xs font-bold text-gray-500 mb-2">
         コメント{comments.length > 0 ? `（${comments.length}）` : ''}
       </p>
-
-      {/* コメント一覧 */}
       {loading ? (
         <div className="text-xs text-gray-400 animate-pulse">読み込み中...</div>
       ) : comments.length === 0 ? (
@@ -83,8 +85,6 @@ export function CommentSection({ storeId }: Props) {
           ))}
         </ul>
       )}
-
-      {/* コメント入力 */}
       <div className="flex gap-2 items-end">
         <textarea
           ref={textareaRef}
