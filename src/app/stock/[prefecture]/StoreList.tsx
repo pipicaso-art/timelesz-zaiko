@@ -275,7 +275,15 @@ export function StoreList({ prefectureCode }: Props) {
                         </span>
                       )}
                     </div>
-                    {store.address && <p className="text-gray-400 text-xs mt-0.5">{store.address}</p>}
+                    {store.address ? (
+                      <p className="text-gray-400 text-xs mt-0.5">{store.address}</p>
+                    ) : (
+                      <a href={`https://maps.google.com/?q=${encodeURIComponent(store.name + ' ' + store.prefecture)}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="text-xs text-blue-400 hover:text-blue-600 mt-0.5 inline-block">
+                        🗺 地図で確認
+                      </a>
+                    )}
                     {latestTime && (
                       <p className="text-gray-400 text-xs mt-0.5">
                         最終更新：{formatDistanceToNow(new Date(latestTime), { addSuffix: true, locale: ja })}
