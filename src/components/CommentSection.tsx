@@ -13,9 +13,10 @@ interface Comment {
 
 interface Props {
   storeId: string;
+  onCommentSubmitted?: () => void;
 }
 
-export function CommentSection({ storeId }: Props) {
+export function CommentSection({ storeId, onCommentSubmitted }: Props) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState('');
@@ -49,6 +50,7 @@ export function CommentSection({ storeId }: Props) {
       if (res.ok) {
         setText('');
         await loadComments();
+        onCommentSubmitted?.();
       }
     } finally {
       setSubmitting(false);

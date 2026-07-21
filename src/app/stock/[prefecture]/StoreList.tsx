@@ -7,6 +7,7 @@ import type { Store, Edition, StockRange } from '@/types';
 import { EDITION_LABELS, STOCK_RANGE_LABELS, STOCK_RANGE_COLORS } from '@/types';
 import { UpdateModal } from '@/components/UpdateModal';
 import { CommentSection } from '@/components/CommentSection';
+import { Fireworks } from '@/components/Fireworks';
 import { SUPABASE_URL, SUPABASE_HEADERS } from '@/lib/supabase';
 
 interface StockEntry {
@@ -65,6 +66,7 @@ export function StoreList({ prefectureCode }: Props) {
   const [locating, setLocating] = useState(false);
   const [userCoords, setUserCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [distances, setDistances] = useState<Record<string, number>>({});
+  const [showFireworks, setShowFireworks] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -275,15 +277,11 @@ export function StoreList({ prefectureCode }: Props) {
                         </span>
                       )}
                     </div>
-                    {store.address ? (
-                      <p className="text-gray-400 text-xs mt-0.5">{store.address}</p>
-                    ) : (
-                      <a href={`https://maps.google.com/?q=${encodeURIComponent(store.name + ' ' + store.prefecture)}`}
-                        target="_blank" rel="noopener noreferrer"
-                        className="text-xs text-blue-400 hover:text-blue-600 mt-0.5 inline-block">
-                        🗺 地図で確認
-                      </a>
-                    )}
+                    <a href={`https://maps.google.com/?q=${encodeURIComponent(store.address || (store.name + ' ' + store.prefecture))}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="text-xs text-blue-400 hover:text-blue-600 mt-0.5 inline-block">
+                      🗺 {store.address || '地図で確認'}
+                    </a>
                     {latestTime && (
                       <p className="text-gray-400 text-xs mt-0.5">
                         最終更新：{formatDistanceToNow(new Date(latestTime), { addSuffix: true, locale: ja })}
@@ -331,15 +329,20 @@ export function StoreList({ prefectureCode }: Props) {
                     })}
                   </div>
                 )}
-                <CommentSection storeId={store.id} />
+                <CommentSection storeId={store.id} onCommentSubmitted={() => setShowFireworks(true)} />
               </div>
             );
           })}
         </div>
       )}
       {selectedStore && (
-        <UpdateModal store={selectedStore} onClose={() => setSelectedStore(null)} onSuccess={loadData} />
+        <UpdateModal
+          store={selectedStore}
+          onClose={() => setSelectedStore(null)}
+          onSuccess={() => { loadData(); setShowFireworks(true); }}
+        />
       )}
+      <Fireworks show={showFireworks} onDone={() => setShowFireworks(false)} />
     </>
   );
 }
