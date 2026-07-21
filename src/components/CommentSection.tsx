@@ -75,7 +75,7 @@ export function CommentSection({ storeId, onCommentSubmitted }: Props) {
         <p className="text-xs text-gray-400 mb-2">まだコメントがありません</p>
       ) : (
         <ul className="space-y-2 mb-3 max-h-48 overflow-y-auto">
-          {[...comments].reverse().map((c) => (
+          {comments.map((c) => (
             <li key={c.id} className="flex gap-2 text-xs">
               <div className="flex-1 bg-gray-50 rounded-lg px-3 py-2">
                 <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">{c.text}</p>
