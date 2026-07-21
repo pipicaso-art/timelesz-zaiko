@@ -74,8 +74,7 @@ export function Fireworks({ show, onDone }: Props) {
     let animId: number;
 
     function animate() {
-      ctx.fillStyle = 'rgba(0,0,0,0.15)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const elapsed = Date.now() - startTime;
 
