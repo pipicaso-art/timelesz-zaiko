@@ -1,17 +1,9 @@
 import { Sidebar } from '@/components/Sidebar';
 import { PrefectureList } from '@/components/PrefectureList';
 import { SalesProgress } from '@/components/SalesProgress';
-
-const RELEASE_DATE = new Date('2026-07-29T00:00:00+09:00');
-
-function getDaysUntilRelease() {
-  const now = new Date();
-  const diff = RELEASE_DATE.getTime() - now.getTime();
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
+import { ReleaseCountdown } from '@/components/ReleaseCountdown';
 
 export default function HomePage() {
-  const daysUntil = getDaysUntilRelease();
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-6 flex gap-6">
@@ -22,16 +14,7 @@ export default function HomePage() {
           </p>
           <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mb-3">消えない花火</h1>
           <p className="text-gray-500 mb-4">2026年7月29日（水）発売</p>
-          {daysUntil > 0 ? (
-            <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 mb-5">
-              <span className="text-emerald-700 font-black text-2xl">{daysUntil}</span>
-              <span className="text-emerald-600 text-sm">日後に発売</span>
-            </div>
-          ) : (
-            <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 mb-5">
-              <span className="text-emerald-700 font-bold">🎉 発売中！</span>
-            </div>
-          )}
+          <ReleaseCountdown />
           <SalesProgress />
           <div className="mt-5">
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">発売CDの種類</p>
