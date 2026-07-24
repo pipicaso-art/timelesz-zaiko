@@ -108,6 +108,15 @@ export function StoreList({ prefectureCode }: Props) {
   }, [prefectureCode]);
 
   useEffect(() => {
+    // ホーム画面アプリがフォアグラウンドに戻ったときにデータを再取得
+    function handleVisibility() {
+      if (document.visibilityState === 'visible') loadData();
+    }
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [loadData]);
+
+  useEffect(() => {
     loadData();
     try {
       const saved = localStorage.getItem('timelesz-favorites');
