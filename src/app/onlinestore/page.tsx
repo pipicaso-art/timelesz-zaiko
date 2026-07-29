@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Sidebar } from '@/components/Sidebar';
 
 export const metadata: Metadata = {
-  title: 'オンラインで購入はこちらから | timelesz在庫チェッカー',
+  title: 'オンラインで購入はこちらから | TSZ在庫チェッカー',
   description: 'timelesz「消えない花火」のオンライン購入リンクです',
 };
 

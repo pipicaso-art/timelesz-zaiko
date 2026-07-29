@@ -18,9 +18,9 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { prefecture } = await params;
   const pref = getPrefectureByCode(prefecture);
-  if (!pref) return { title: '在庫チェッカー | timelesz' };
+  if (!pref) return { title: 'TSZ在庫チェッカー' };
   return {
-    title: `${pref.name}の在庫 | timelesz在庫チェッカー`,
+    title: `${pref.name}の在庫 | TSZ在庫チェッカー`,
     description: `timelesz「消えない花火」の${pref.name}のCDショップ在庫状況`,
   };
 }

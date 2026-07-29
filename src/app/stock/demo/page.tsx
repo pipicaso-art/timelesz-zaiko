@@ -4,7 +4,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { StoreList } from '../[prefecture]/StoreList';
 
 export const metadata: Metadata = {
-  title: '練習用デモ | timelesz在庫チェッカー',
+  title: '練習用デモ | TSZ在庫チェッカー',
   description: '在庫情報の更新方法を練習できるデモページです',
 };
 

@@ -3,20 +3,20 @@ import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://timelesz-zaiko-static.pages.dev'),
-  title: 'timelesz在庫チェッカー',
+  title: 'TSZ在庫チェッカー',
   description: '発売されるtimeleszのCD在庫状況を全国のファンで共有！みんなで作るファンサイトです',
   keywords: 'timelesz,在庫チェッカー,CD在庫,消えない花火',
   themeColor: '#2DD4BF',
   openGraph: {
-    title: 'timelesz在庫チェッカー',
+    title: 'TSZ在庫チェッカー',
     description: '発売されるtimeleszのCD在庫状況を全国のファンで共有！みんなで作るファンサイトです',
     type: 'website',
     locale: 'ja_JP',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'timelesz在庫チェッカー' }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TSZ在庫チェッカー' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'timelesz在庫チェッカー',
+    title: 'TSZ在庫チェッカー',
     description: '発売されるtimeleszのCD在庫状況を全国のファンで共有！みんなで作るファンサイトです',
     images: ['/og-image.png'],
   },
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'timelesz在庫チェッカー',
+    title: 'TSZ在庫チェッカー',
   },
   icons: {
     apple: '/apple-touch-icon.png',
@@ -43,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
             <a href="/" className="flex items-center gap-2">
               <span className="text-xl font-black tracking-tight text-gray-900">
-                timelesz<span className="text-emerald-600">在庫チェッカー</span>
+                TSZ<span className="text-emerald-600">在庫チェッカー</span>
               </span>
             </a>
             <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -56,7 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
         {children}
         <footer className="border-t border-gray-200 mt-16 py-8 text-center text-sm text-gray-500 bg-white">
-          <p>timelesz在庫チェッカー — ファンサイト（unofficial）</p>
+          <p>TSZ在庫チェッカー — ファンサイト（unofficial）</p>
         </footer>
       </body>
     </html>

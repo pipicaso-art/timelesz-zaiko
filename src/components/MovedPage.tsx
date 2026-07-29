@@ -38,7 +38,7 @@ export function MovedPage() {
 
       {/* タイトル */}
       <h1 className="text-white text-2xl font-black mb-1">
-        timelesz在庫チェッカー
+        TSZ在庫チェッカー
       </h1>
       <p className="text-white/60 text-xs mb-8">※ファンサイト（unofficial）</p>
 
