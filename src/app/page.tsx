@@ -2,11 +2,13 @@ import { Sidebar } from '@/components/Sidebar';
 import { PrefectureList } from '@/components/PrefectureList';
 import { SalesProgress } from '@/components/SalesProgress';
 import { ReleaseCountdown } from '@/components/ReleaseCountdown';
+import { WelcomeFireworks } from '@/components/WelcomeFireworks';
 
 export default function HomePage() {
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-6 flex gap-6">
+      <WelcomeFireworks />
       <div className="flex-1 min-w-0 space-y-6">
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <p className="text-emerald-600 text-sm font-bold uppercase tracking-widest mb-2">
