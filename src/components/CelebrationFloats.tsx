@@ -110,6 +110,34 @@ export function CelebrationFloats() {
       }
     }
 
+    const LINES = ['消えない花火', 'timelesz', '発売おめでとう！！！！！！'];
+    const RAINBOW = ['#FF4081','#FF9800','#FFEB3B','#4CAF50','#00BCD4','#9C27B0','#E91E63'];
+
+    function drawText(frame: number) {
+      const cx = canvas.width / 2;
+      const pulse = 1 + Math.sin(frame * 0.06) * 0.04;
+
+      LINES.forEach((line, i) => {
+        const sizes = [canvas.width * 0.07, canvas.width * 0.055, canvas.width * 0.065];
+        const yPos = [canvas.height * 0.30, canvas.height * 0.42, canvas.height * 0.54];
+        const size = Math.round(sizes[i] * pulse);
+        ctx.font = `900 ${size}px "Hiragino Sans", "Yu Gothic", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // 虹色アウトライン
+        const colorIdx = (frame + i * 3) % RAINBOW.length;
+        ctx.strokeStyle = RAINBOW[colorIdx];
+        ctx.lineWidth = size * 0.12;
+        ctx.lineJoin = 'round';
+        ctx.strokeText(line, cx, yPos[i]);
+
+        // 白テキスト
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(line, cx, yPos[i]);
+      });
+    }
+
     let animId: number;
     let frame = 0;
     let lastTime = 0;
@@ -142,6 +170,8 @@ export function CelebrationFloats() {
 
         drawChar(c);
       }
+
+      drawText(frame);
     }
 
     requestAnimationFrame(tick);
