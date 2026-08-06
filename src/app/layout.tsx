@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { VisitTracker } from '@/components/VisitTracker';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://timelesz-zaiko-static.pages.dev'),
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
         </header>
+        <VisitTracker />
         {children}
         <footer className="border-t border-gray-200 mt-16 py-8 text-center text-sm text-gray-500 bg-white">
           <p>TSZ在庫チェッカー — ファンサイト（unofficial）</p>

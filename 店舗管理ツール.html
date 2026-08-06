@@ -70,6 +70,35 @@
 <body>
 <h1>🏪 timelesz 店舗管理ツール</h1>
 
+<!-- 訪問者数 -->
+<h2>👥 訪問者数（セッション数）</h2>
+<div class="add-form" style="align-items:flex-start; gap:16px; flex-direction:column;">
+  <div id="visitStats" style="font-size:13px; color:#666;">読み込み中...</div>
+  <button class="btn-blue" onclick="loadVisitStats()" style="padding:6px 12px;">🔄 更新</button>
+</div>
+
+<!-- 売上枚数更新 -->
+<h2>📊 売上枚数を更新</h2>
+<div class="add-form" style="align-items:center; gap:16px;">
+  <div>
+    <label>オリコン（枚）</label>
+    <input type="number" id="oriconCount" placeholder="例: 336000" style="width:150px">
+  </div>
+  <div>
+    <label>Billboard Japan（枚）</label>
+    <input type="number" id="billboardCount" placeholder="例: 0" style="width:150px">
+  </div>
+  <div>
+    <label>目標枚数（枚）</label>
+    <input type="number" id="targetCount" placeholder="500000" style="width:150px">
+  </div>
+  <div style="display:flex; gap:8px; align-items:flex-end;">
+    <button class="btn-green" onclick="updateSalesCount()">💾 更新する</button>
+    <button class="btn-blue" onclick="loadSalesCount()">🔄 現在値を読み込む</button>
+  </div>
+  <div id="salesStatus" style="font-size:13px; color:#27ae60; font-weight:bold;"></div>
+</div>
+
 <!-- 店舗追加フォーム -->
 <h2>➕ 店舗を追加</h2>
 <div class="add-form">
@@ -612,6 +641,86 @@ async function bulkAutoFetch() {
 }
 
 loadStores();
+loadSalesCount();
+loadVisitStats();
+
+async function loadVisitStats() {
+  const el = document.getElementById('visitStats');
+  el.textContent = '読み込み中...';
+  try {
+    // 累計
+    const totalRes = await fetch(`${SUPABASE_URL}/rest/v1/visits?select=id`, {
+      headers: { ...HEADERS, 'Prefer': 'count=exact' }
+    });
+    const totalRange = totalRes.headers.get('content-range') || '';
+    const total = totalRange.split('/')[1] || '?';
+
+    // 日別（直近14日）
+    const since = new Date(Date.now() - 14*24*60*60*1000).toISOString();
+    const recentRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/visits?select=created_at&created_at=gte.${since}&order=created_at.desc&limit=5000`,
+      { headers: HEADERS }
+    );
+    const recent = await recentRes.json();
+
+    // 日別集計（JST = UTC+9）
+    const byDay = {};
+    recent.forEach(v => {
+      const jst = new Date(new Date(v.created_at).getTime() + 9*60*60*1000);
+      const day = jst.toISOString().slice(0, 10);
+      byDay[day] = (byDay[day] || 0) + 1;
+    });
+
+    const days = Object.keys(byDay).sort().reverse().slice(0, 10);
+    const tableRows = days.map(d => `<tr><td style="padding:2px 12px 2px 0">${d}</td><td style="font-weight:bold;color:#2c3e50">${byDay[d].toLocaleString()}人</td></tr>`).join('');
+
+    el.innerHTML = `
+      <div style="margin-bottom:10px;font-size:15px;font-weight:bold;color:#2c3e50">累計訪問者数: <span style="font-size:20px;color:#27ae60">${parseInt(total).toLocaleString()}人</span></div>
+      <table style="font-size:13px;border-collapse:collapse">
+        <tr><th style="text-align:left;padding:2px 12px 6px 0;color:#666;font-weight:normal">日付</th><th style="text-align:left;padding:2px 0 6px 0;color:#666;font-weight:normal">訪問者数</th></tr>
+        ${tableRows}
+      </table>
+      <div style="margin-top:8px;font-size:11px;color:#999">※同じブラウザでの重複アクセスは除外（セッション単位）</div>
+    `;
+  } catch(e) {
+    el.textContent = '❌ 取得失敗: ' + e.message;
+  }
+}
+
+async function loadSalesCount() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/song_stats?select=*&order=id.desc&limit=1`, { headers: HEADERS });
+  const data = await res.json();
+  if (Array.isArray(data) && data.length > 0) {
+    const s = data[0];
+    document.getElementById('oriconCount').value = s.own_count || '';
+    document.getElementById('billboardCount').value = s.billboard_count || '';
+    document.getElementById('targetCount').value = s.target || 500000;
+    document.getElementById('salesStatus').textContent = `現在値: オリコン ${(s.own_count||0).toLocaleString()}枚 / Billboard ${(s.billboard_count||0).toLocaleString()}枚`;
+  }
+}
+
+async function updateSalesCount() {
+  const own_count = parseInt(document.getElementById('oriconCount').value) || 0;
+  const billboard_count = parseInt(document.getElementById('billboardCount').value) || 0;
+  const target = parseInt(document.getElementById('targetCount').value) || 500000;
+  const statusEl = document.getElementById('salesStatus');
+  statusEl.textContent = '更新中...';
+  statusEl.style.color = '#666';
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/song_stats?id=eq.1`, {
+    method: 'PATCH',
+    headers: { ...HEADERS, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+    body: JSON.stringify({ own_count, billboard_count, target, updated_at: new Date().toISOString() })
+  });
+  if (res.ok) {
+    const ownPct = ((own_count / target) * 100).toFixed(1);
+    const bbPct = ((billboard_count / target) * 100).toFixed(1);
+    statusEl.textContent = `✅ 更新完了！ オリコン ${own_count.toLocaleString()}枚 (${ownPct}%) / Billboard ${billboard_count.toLocaleString()}枚 (${bbPct}%)`;
+    statusEl.style.color = '#27ae60';
+  } else {
+    statusEl.textContent = '❌ 更新失敗。Supabaseの権限を確認してください。';
+    statusEl.style.color = '#e74c3c';
+  }
+}
 </script>
 </body>
 </html>
