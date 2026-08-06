@@ -9,6 +9,8 @@ interface SongStats {
   own_count: number;
   target: number;
   updated_at: string;
+  own_date: string | null;
+  billboard_date: string | null;
 }
 
 function ProgressBar({ current, target, color }: { current: number; target: number; color: string }) {
@@ -26,6 +28,12 @@ function ProgressBar({ current, target, color }: { current: number; target: numb
 
 function formatCount(n: number) {
   return n.toLocaleString('ja-JP');
+}
+
+function formatDate(d: string | null) {
+  if (!d) return null;
+  // "2026-08-02" → "2026/08/02現在"
+  return d.replace(/-/g, '/') + '現在';
 }
 
 export function SalesProgress() {
@@ -79,6 +87,9 @@ export function SalesProgress() {
               </span>
             </div>
             <ProgressBar current={stats.billboard_count} target={stats.target} color="bg-emerald-500" />
+            {formatDate(stats.billboard_date) && (
+              <p className="text-xs text-gray-400 mt-1">{formatDate(stats.billboard_date)}</p>
+            )}
             {stats.billboard_count >= stats.target && (
               <p className="text-xs text-emerald-600 mt-1 font-medium">🎉 目標達成！</p>
             )}
@@ -92,6 +103,9 @@ export function SalesProgress() {
               </span>
             </div>
             <ProgressBar current={stats.own_count} target={stats.target} color="bg-blue-400" />
+            {formatDate(stats.own_date) && (
+              <p className="text-xs text-gray-400 mt-1">{formatDate(stats.own_date)}</p>
+            )}
           </div>
         </div>
         <p className="text-xs text-gray-400 mt-3">※各チャートの公式集計</p>

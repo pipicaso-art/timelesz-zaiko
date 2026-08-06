@@ -83,10 +83,12 @@
   <div>
     <label>オリコン（枚）</label>
     <input type="number" id="oriconCount" placeholder="例: 336000" style="width:150px">
+    <input type="date" id="oriconDate" style="width:140px; margin-top:4px; display:block; padding:5px 8px; border:1px solid #ccc; border-radius:4px;">
   </div>
   <div>
     <label>Billboard Japan（枚）</label>
     <input type="number" id="billboardCount" placeholder="例: 0" style="width:150px">
+    <input type="date" id="billboardDate" style="width:140px; margin-top:4px; display:block; padding:5px 8px; border:1px solid #ccc; border-radius:4px;">
   </div>
   <div>
     <label>目標枚数（枚）</label>
@@ -695,6 +697,8 @@ async function loadSalesCount() {
     document.getElementById('oriconCount').value = s.own_count || '';
     document.getElementById('billboardCount').value = s.billboard_count || '';
     document.getElementById('targetCount').value = s.target || 500000;
+    document.getElementById('oriconDate').value = s.own_date || '';
+    document.getElementById('billboardDate').value = s.billboard_date || '';
     document.getElementById('salesStatus').textContent = `現在値: オリコン ${(s.own_count||0).toLocaleString()}枚 / Billboard ${(s.billboard_count||0).toLocaleString()}枚`;
   }
 }
@@ -709,7 +713,7 @@ async function updateSalesCount() {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/song_stats?id=eq.1`, {
     method: 'PATCH',
     headers: { ...HEADERS, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-    body: JSON.stringify({ own_count, billboard_count, target, updated_at: new Date().toISOString() })
+    body: JSON.stringify({ own_count, billboard_count, target, own_date: document.getElementById('oriconDate').value || null, billboard_date: document.getElementById('billboardDate').value || null, updated_at: new Date().toISOString() })
   });
   if (res.ok) {
     const ownPct = ((own_count / target) * 100).toFixed(1);
