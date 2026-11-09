@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>timelesz 店舗管理ツール</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+  h1 { color: #333; margin-bottom: 16px; }
+  h2 { font-size: 15px; color: #555; margin: 16px 0 8px; border-left: 4px solid #27ae60; padding-left: 8px; }
+  .controls { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+  input[type=text] { padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; }
+  select { padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+  button { padding: 8px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+  .btn-green { background: #27ae60; color: white; }
+  .btn-green:hover { background: #1e8449; }
+  .btn-sql { background: #e74c3c; color: white; }
+  .btn-sql:hover { background: #c0392b; }
+  .btn-blue { background: #3498db; color: white; }
+  .btn-blue:hover { background: #2980b9; }
+  .btn-gray { background: #95a5a6; color: white; }
+  .btn-copy { background: #27ae60; color: white; }
+  .stat { background: white; border: 1px solid #ddd; border-radius: 6px; padding: 8px 14px; font-size: 13px; }
+  .stat span { font-weight: bold; color: #e74c3c; }
+  table { width: 100%; border-collapse: collapse; background: white; font-size: 13px; }
+  th { background: #2c3e50; color: white; padding: 8px 10px; text-align: left; position: sticky; top: 0; white-space: nowrap; }
+  td { padding: 5px 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
+  tr:hover { background: #f9f9f9; }
+  tr.marked-delete { background: #ffe0e0 !important; text-decoration: line-through; color: #999; }
+  tr.marked-delete:hover { background: #ffcdd2 !important; }
+  .icon-select { font-size: 12px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; }
+  .op-select { font-size: 12px; padding: 2px 4px; border: 1px solid #ccc; border-radius: 3px; width: 70px; }
+  .op-select.delete { background: #ffebee; border-color: #e74c3c; color: #c0392b; font-weight: bold; }
+  .name-cell { position: relative; }
+  .name-display { cursor: pointer; }
+  .name-display:hover { text-decoration: underline; color: #2980b9; }
+  .name-input { width: 100%; padding: 2px 6px; border: 2px solid #3498db; border-radius: 3px; font-size: 13px; display: none; }
+  .name-changed { background: #fff3cd; }
+  /* 住所セル */
+  .address-cell { min-width: 200px; max-width: 300px; }
+  .addr-wrap { display: flex; align-items: center; gap: 4px; }
+  .addr-link { color: #2980b9; text-decoration: none; font-size: 12px; word-break: break-all; }
+  .addr-link:hover { text-decoration: underline; }
+  .addr-empty { color: #bbb; font-size: 12px; cursor: default; }
+  .edit-addr-btn { background: none; border: 1px solid #ccc; border-radius: 3px; padding: 1px 5px; font-size: 11px; cursor: pointer; color: #666; flex-shrink: 0; }
+  .edit-addr-btn:hover { background: #eee; }
+  .map-search-btn { font-size: 13px; text-decoration: none; opacity: 0.5; flex-shrink: 0; line-height: 1; }
+  .map-search-btn:hover { opacity: 1; }
+  .name-wrap { display: flex; align-items: center; gap: 4px; }
+  .addr-input { width: 100%; padding: 2px 6px; border: 2px solid #27ae60; border-radius: 3px; font-size: 12px; display: none; }
+  .addr-changed { background: #e8f8f0; }
+  .sql-box { margin-top: 20px; padding: 16px; background: #1e1e1e; color: #f8f8f2; border-radius: 6px; font-family: monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all; display: none; max-height: 400px; overflow-y: auto; }
+  .table-wrap { max-height: 65vh; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; }
+  .pref-header td { background: #ecf0f1; font-weight: bold; color: #555; padding: 4px 10px; }
+  .loading { text-align: center; padding: 40px; color: #666; }
+  .add-form { background: white; border: 2px solid #27ae60; border-radius: 8px; padding: 14px; margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+  .add-form label { font-size: 12px; color: #555; display: block; margin-bottom: 4px; }
+  .new-store-row { background: #e8f8f0 !important; }
+  .new-store-row:hover { background: #d4efdf !important; }
+  .tag-new { background: #27ae60; color: white; font-size: 10px; padding: 1px 5px; border-radius: 8px; margin-left: 4px; }
+  .tag-renamed { background: #f39c12; color: white; font-size: 10px; padding: 1px 5px; border-radius: 8px; margin-left: 4px; }
+  .tag-addr { background: #8e44ad; color: white; font-size: 10px; padding: 1px 5px; border-radius: 8px; margin-left: 4px; }
+  .auto-addr-btn { background: none; border: 1px solid #27ae60; border-radius: 3px; padding: 1px 5px; font-size: 11px; cursor: pointer; color: #27ae60; flex-shrink: 0; }
+  .auto-addr-btn:hover { background: #e8f8f0; }
+  .auto-addr-btn:disabled { opacity: 0.4; cursor: default; }
+  .bulk-btn { background: #8e44ad; color: white; }
+  .bulk-btn:hover { background: #7d3c98; }
+  .bulk-btn:disabled { background: #bbb; cursor: default; }
+</style>
+</head>
+<body>
+<h1>🏪 timelesz 店舗管理ツール</h1>
+
+<!-- 訪問者数 -->
+<h2>👥 訪問者数（セッション数）</h2>
+<div class="add-form" style="align-items:flex-start; gap:16px; flex-direction:column;">
+  <div id="visitStats" style="font-size:13px; color:#666;">読み込み中...</div>
+  <button class="btn-blue" onclick="loadVisitStats()" style="padding:6px 12px;">🔄 更新</button>
+</div>
+
+<!-- 売上枚数更新 -->
+<h2>📊 売上枚数を更新</h2>
+<div class="add-form" style="align-items:center; gap:16px;">
+  <div>
+    <label>オリコン（枚）</label>
+    <input type="number" id="oriconCount" placeholder="例: 336000" style="width:150px">
+    <input type="date" id="oriconDate" style="width:140px; margin-top:4px; display:block; padding:5px 8px; border:1px solid #ccc; border-radius:4px;">
+  </div>
+  <div>
+    <label>Billboard Japan（枚）</label>
+    <input type="number" id="billboardCount" placeholder="例: 0" style="width:150px">
+    <input type="date" id="billboardDate" style="width:140px; margin-top:4px; display:block; padding:5px 8px; border:1px solid #ccc; border-radius:4px;">
+  </div>
+  <div>
+    <label>目標枚数（枚）</label>
+    <input type="number" id="targetCount" placeholder="500000" style="width:150px">
+  </div>
+  <div style="display:flex; gap:8px; align-items:flex-end;">
+    <button class="btn-green" onclick="updateSalesCount()">💾 更新する</button>
+    <button class="btn-blue" onclick="loadSalesCount()">🔄 現在値を読み込む</button>
+  </div>
+  <div id="salesStatus" style="font-size:13px; color:#27ae60; font-weight:bold;"></div>
+</div>
+
+<!-- 店舗追加フォーム -->
+<h2>➕ 店舗を追加</h2>
+<div class="add-form">
+  <div>
+    <label>都道府県</label>
+    <select id="newPref" style="width:130px">
+      <option value="">選択してください</option>
+    </select>
+  </div>
+  <div>
+    <label>店舗名</label>
+    <input type="text" id="newName" placeholder="例: タワーレコード渋谷店" style="width:220px">
+  </div>
+  <div>
+    <label>住所（任意）</label>
+    <input type="text" id="newAddress" placeholder="例: 東京都渋谷区神南1-22-14" style="width:280px">
+  </div>
+  <div>
+    <label>オリコン</label>
+    <select id="newOricon">
+      <option value="true">✅ あり</option>
+      <option value="false">❌ なし</option>
+    </select>
+  </div>
+  <div>
+    <label>ビルボード</label>
+    <select id="newBillboard">
+      <option value="true">✅ あり</option>
+      <option value="false">❌ なし</option>
+    </select>
+  </div>
+  <button class="btn-green" onclick="addStore()">➕ 追加</button>
+</div>
+
+<!-- 検索・フィルタ -->
+<h2>📋 店舗一覧</h2>
+<div class="controls">
+  <input type="text" id="search" placeholder="店舗名・都道府県で検索..." oninput="filterTable()" style="width:230px">
+  <select id="filterOp" onchange="filterTable()">
+    <option value="">すべて表示</option>
+    <option value="delete">削除予定のみ</option>
+    <option value="keep">保持のみ</option>
+    <option value="new">新規追加のみ</option>
+    <option value="renamed">名前変更のみ</option>
+    <option value="addr">住所変更のみ</option>
+    <option value="no-addr">住所未登録のみ</option>
+  </select>
+  <select id="filterPref" onchange="filterTable()">
+    <option value="">都道府県：すべて</option>
+  </select>
+  <button class="btn-blue" onclick="loadStores()">🔄 再読み込み</button>
+  <button class="btn-gray" onclick="markAllVisible('delete')">表示中をすべて削除</button>
+  <button class="btn-gray" onclick="markAllVisible('keep')">表示中をすべて保持</button>
+</div>
+<div class="controls">
+  <div class="stat">総店舗数: <span id="totalCount">-</span></div>
+  <div class="stat">削除予定: <span id="deleteCount" style="color:#e74c3c">0</span></div>
+  <div class="stat">新規追加: <span id="newCount" style="color:#27ae60">0</span></div>
+  <div class="stat">名前変更: <span id="renamedCount" style="color:#f39c12">0</span></div>
+  <div class="stat">住所変更: <span id="addrChangedCount" style="color:#8e44ad">0</span></div>
+  <div class="stat">住所未登録: <span id="noAddrCount" style="color:#bbb">-</span></div>
+  <div class="stat">表示中: <span id="visibleCount">-</span></div>
+  <button class="bulk-btn" id="bulkBtn" onclick="bulkAutoFetch()">🤖 住所を一括自動取得（未登録のみ）</button>
+  <button class="btn-sql" onclick="generateSQL()">⚠️ SQL生成</button>
+  <button class="btn-copy" onclick="copySQL()" id="copyBtn" style="display:none">📋 SQLをコピー</button>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>操作</th>
+        <th>#</th>
+        <th>都道府県</th>
+        <th>店舗名 <span style="font-size:11px;font-weight:normal">（クリックで編集）</span></th>
+        <th>住所 <span style="font-size:11px;font-weight:normal">（✏️で編集・テキストでMAP表示）</span></th>
+        <th>オリコン</th>
+        <th>ビルボード</th>
+      </tr>
+    </thead>
+    <tbody id="tbody">
+      <tr><td colspan="7" class="loading">読み込み中...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="sql-box" id="sqlBox"></div>
+
+<script>
+const SUPABASE_URL = 'https://mxplxvthjtxbxehigpki.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq';
+const HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+
+const PREF_CODES = {
+  '北海道':'hokkaido','青森県':'aomori','岩手県':'iwate','宮城県':'miyagi','秋田県':'akita','山形県':'yamagata','福島県':'fukushima',
+  '茨城県':'ibaraki','栃木県':'tochigi','群馬県':'gunma','埼玉県':'saitama','千葉県':'chiba','東京都':'tokyo','神奈川県':'kanagawa',
+  '新潟県':'niigata','富山県':'toyama','石川県':'ishikawa','福井県':'fukui','山梨県':'yamanashi','長野県':'nagano','岐阜県':'gifu',
+  '静岡県':'shizuoka','愛知県':'aichi','三重県':'mie','滋賀県':'shiga','京都府':'kyoto','大阪府':'osaka','兵庫県':'hyogo',
+  '奈良県':'nara','和歌山県':'wakayama','鳥取県':'tottori','島根県':'shimane','岡山県':'okayama','広島県':'hiroshima','山口県':'yamaguchi',
+  '徳島県':'tokushima','香川県':'kagawa','愛媛県':'ehime','高知県':'kochi','福岡県':'fukuoka','佐賀県':'saga','長崎県':'nagasaki',
+  '熊本県':'kumamoto','大分県':'oita','宮崎県':'miyazaki','鹿児島県':'kagoshima','沖縄県':'okinawa'
+};
+
+let allStores = [];
+let operations = {};   // id -> 'keep' | 'delete'
+let oriconMap = {};
+let billboardMap = {};
+let nameMap = {};      // id -> current name
+let addressMap = {};   // id -> current address
+let newStores = [];    // [{tempId, name, prefecture, prefecture_code, oricon, billboard, address}]
+
+async function loadStores() {
+  document.getElementById('tbody').innerHTML = '<tr><td colspan="7" class="loading">読み込み中...</td></tr>';
+  const [r1, r2] = await Promise.all([
+    fetch(`${SUPABASE_URL}/rest/v1/stores?select=id,name,prefecture,prefecture_code,oricon,billboard,address&order=prefecture_code,name&limit=1000&offset=0`, {headers: HEADERS}).then(r=>r.json()),
+    fetch(`${SUPABASE_URL}/rest/v1/stores?select=id,name,prefecture,prefecture_code,oricon,billboard,address&order=prefecture_code,name&limit=1000&offset=1000`, {headers: HEADERS}).then(r=>r.json()),
+  ]);
+  allStores = [...r1, ...r2];
+  document.getElementById('totalCount').textContent = allStores.length;
+
+  allStores.forEach(s => {
+    if (!operations[s.id]) operations[s.id] = 'keep';
+    if (oriconMap[s.id] === undefined) oriconMap[s.id] = s.oricon;
+    if (billboardMap[s.id] === undefined) billboardMap[s.id] = s.billboard;
+    if (!nameMap[s.id]) nameMap[s.id] = s.name;
+    if (addressMap[s.id] === undefined) addressMap[s.id] = s.address || '';
+  });
+
+  const noAddr = allStores.filter(s => !s.address).length;
+  document.getElementById('noAddrCount').textContent = noAddr;
+
+  // 都道府県セレクト
+  const prefs = [...new Set(allStores.map(s => s.prefecture))];
+  const prefSel = document.getElementById('filterPref');
+  const newPrefSel = document.getElementById('newPref');
+  prefSel.innerHTML = '<option value="">都道府県：すべて</option>';
+  newPrefSel.innerHTML = '<option value="">選択してください</option>';
+  prefs.forEach(p => {
+    prefSel.insertAdjacentHTML('beforeend', `<option value="${p}">${p}</option>`);
+    newPrefSel.insertAdjacentHTML('beforeend', `<option value="${p}">${p}</option>`);
+  });
+
+  renderTable();
+}
+
+function addStore() {
+  const pref = document.getElementById('newPref').value;
+  const name = document.getElementById('newName').value.trim();
+  const address = document.getElementById('newAddress').value.trim();
+  const oricon = document.getElementById('newOricon').value === 'true';
+  const billboard = document.getElementById('newBillboard').value === 'true';
+
+  if (!pref) { alert('都道府県を選択してください'); return; }
+  if (!name) { alert('店舗名を入力してください'); return; }
+
+  const tempId = 'new-' + Date.now();
+  newStores.push({ tempId, name, prefecture: pref, prefecture_code: PREF_CODES[pref] || pref, oricon, billboard, address });
+
+  document.getElementById('newName').value = '';
+  document.getElementById('newAddress').value = '';
+  document.getElementById('newCount').textContent = newStores.length;
+  renderTable();
+}
+
+function renderTable() {
+  const search = document.getElementById('search').value.toLowerCase();
+  const filterOp = document.getElementById('filterOp').value;
+  const filterPref = document.getElementById('filterPref').value;
+
+  const filteredExisting = allStores.filter(s => {
+    if (filterPref && s.prefecture !== filterPref) return false;
+    if (filterOp === 'new') return false;
+    if (filterOp === 'renamed') return nameMap[s.id] !== s.name;
+    if (filterOp === 'addr') return (addressMap[s.id] || '') !== (s.address || '');
+    if (filterOp === 'no-addr') return !s.address && !addressMap[s.id];
+    if (filterOp === 'delete') return operations[s.id] === 'delete';
+    if (filterOp === 'keep') return operations[s.id] === 'keep';
+    const n = nameMap[s.id].toLowerCase();
+    if (search && !n.includes(search) && !s.prefecture.includes(search)) return false;
+    return true;
+  }).filter(s => {
+    if (!filterOp || filterOp === 'delete' || filterOp === 'keep' || filterOp === 'renamed' || filterOp === 'addr' || filterOp === 'no-addr') {
+      const n = nameMap[s.id].toLowerCase();
+      if (search && !n.includes(search) && !s.prefecture.includes(search)) return false;
+    }
+    return true;
+  });
+
+  const filteredNew = newStores.filter(s => {
+    if (filterOp && filterOp !== 'new') return false;
+    if (filterPref && s.prefecture !== filterPref) return false;
+    if (search && !s.name.toLowerCase().includes(search) && !s.prefecture.includes(search)) return false;
+    return true;
+  });
+
+  const total = filteredExisting.length + filteredNew.length;
+  document.getElementById('visibleCount').textContent = total;
+  document.getElementById('deleteCount').textContent = Object.values(operations).filter(v=>v==='delete').length;
+  document.getElementById('newCount').textContent = newStores.length;
+  document.getElementById('renamedCount').textContent = allStores.filter(s => nameMap[s.id] !== s.name).length;
+  document.getElementById('addrChangedCount').textContent = allStores.filter(s => (addressMap[s.id]||'') !== (s.address||'')).length;
+
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  let lastPref = '';
+  let idx = 0;
+
+  // 新規店舗を先頭に表示
+  filteredNew.forEach(s => {
+    if (s.prefecture !== lastPref) {
+      tbody.insertAdjacentHTML('beforeend', `<tr class="pref-header"><td colspan="7">📍 ${s.prefecture}（新規）</td></tr>`);
+      lastPref = s.prefecture;
+    }
+    idx++;
+    const addrLink = s.address
+      ? `<a class="addr-link" href="https://maps.google.com/?q=${encodeURIComponent(s.address)}" target="_blank">${esc(s.address)}</a>`
+      : `<span class="addr-empty">未登録</span>`;
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr class="new-store-row" id="row-${s.tempId}">
+        <td><button onclick="removeNew('${s.tempId}')" style="background:#e74c3c;color:white;padding:2px 8px;border:none;border-radius:3px;cursor:pointer;font-size:12px">削除</button></td>
+        <td style="color:#999;font-size:11px">${idx}</td>
+        <td>${s.prefecture}</td>
+        <td><div class="name-wrap">${esc(s.name)} <span class="tag-new">NEW</span><a class="map-search-btn" href="https://maps.google.com/?q=${encodeURIComponent(s.name + ' ' + s.prefecture)}" target="_blank" title="Google Mapsで検索">🗺</a></div></td>
+        <td class="address-cell"><div class="addr-wrap">${addrLink}</div></td>
+        <td><select class="icon-select" onchange="setNewOricon('${s.tempId}',this.value)">
+          <option value="true" ${s.oricon?'selected':''}>✅ あり</option>
+          <option value="false" ${!s.oricon?'selected':''}>❌ なし</option>
+        </select></td>
+        <td><select class="icon-select" onchange="setNewBillboard('${s.tempId}',this.value)">
+          <option value="true" ${s.billboard?'selected':''}>✅ あり</option>
+          <option value="false" ${!s.billboard?'selected':''}>❌ なし</option>
+        </select></td>
+      </tr>`);
+  });
+
+  lastPref = '';
+  filteredExisting.forEach((s) => {
+    if (s.prefecture !== lastPref) {
+      tbody.insertAdjacentHTML('beforeend', `<tr class="pref-header"><td colspan="7">📍 ${s.prefecture}</td></tr>`);
+      lastPref = s.prefecture;
+    }
+    idx++;
+    const op = operations[s.id];
+    const renamed = nameMap[s.id] !== s.name;
+    const currentAddr = addressMap[s.id] || '';
+    const addrChanged = currentAddr !== (s.address || '');
+    const nameTag = renamed ? `<span class="tag-renamed">変更</span>` : '';
+    const addrTag = addrChanged ? `<span class="tag-addr">住所変更</span>` : '';
+    const addrLink = currentAddr
+      ? `<a class="addr-link" href="https://maps.google.com/?q=${encodeURIComponent(currentAddr)}" target="_blank">${esc(currentAddr)}</a>`
+      : `<span class="addr-empty">未登録</span>`;
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr id="row-${s.id}" class="${op==='delete'?'marked-delete':''}">
+        <td>
+          <select class="op-select ${op==='delete'?'delete':''}" onchange="setOp('${s.id}',this.value,this)">
+            <option value="keep" ${op==='keep'?'selected':''}>保持</option>
+            <option value="delete" ${op==='delete'?'selected':''}>🗑削除</option>
+          </select>
+        </td>
+        <td style="color:#999;font-size:11px">${idx}</td>
+        <td>${s.prefecture}</td>
+        <td class="name-cell ${renamed?'name-changed':''}">
+          <div class="name-wrap">
+            <span class="name-display" onclick="startEdit('${s.id}')" title="クリックで名前編集">${esc(nameMap[s.id])}${nameTag}</span>
+            <a class="map-search-btn" href="https://maps.google.com/?q=${encodeURIComponent(nameMap[s.id] + ' ' + s.prefecture)}" target="_blank" title="Google Mapsで検索">🗺</a>
+          </div>
+          <input class="name-input" id="ninput-${s.id}" value="${esc(nameMap[s.id])}"
+            onblur="endEdit('${s.id}')" onkeydown="if(event.key==='Enter')endEdit('${s.id}');if(event.key==='Escape')cancelEdit('${s.id}')">
+        </td>
+        <td class="address-cell ${addrChanged?'addr-changed':''}">
+          <div class="addr-wrap" id="addr-wrap-${s.id}">
+            ${addrLink}${addrTag}
+            <button class="auto-addr-btn" id="autobtn-${s.id}" onclick="autoFetchAddress('${s.id}','${esc(nameMap[s.id])}','${esc(s.prefecture)}')" title="住所を自動取得">🔍</button>
+            <button class="edit-addr-btn" onclick="startAddressEdit('${s.id}')">✏️</button>
+          </div>
+          <input class="addr-input" id="ainput-${s.id}" value="${esc(currentAddr)}"
+            onblur="endAddressEdit('${s.id}')"
+            onkeydown="if(event.key==='Enter')endAddressEdit('${s.id}');if(event.key==='Escape')cancelAddressEdit('${s.id}')"
+            placeholder="例: 東京都渋谷区神南1-22-14">
+        </td>
+        <td><select class="icon-select" onchange="setOricon('${s.id}',this.value)">
+          <option value="true" ${oriconMap[s.id]?'selected':''}>✅ あり</option>
+          <option value="false" ${!oriconMap[s.id]?'selected':''}>❌ なし</option>
+        </select></td>
+        <td><select class="icon-select" onchange="setBillboard('${s.id}',this.value)">
+          <option value="true" ${billboardMap[s.id]?'selected':''}>✅ あり</option>
+          <option value="false" ${!billboardMap[s.id]?'selected':''}>❌ なし</option>
+        </select></td>
+      </tr>`);
+  });
+
+  if (total === 0) tbody.innerHTML = '<tr><td colspan="7" class="loading">該当する店舗がありません</td></tr>';
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// 店舗名編集
+function startEdit(id) {
+  const input = document.getElementById('ninput-' + id);
+  input.style.display = 'block';
+  input.previousElementSibling.style.display = 'none';
+  input.focus(); input.select();
+}
+function endEdit(id) {
+  const input = document.getElementById('ninput-' + id);
+  const newName = input.value.trim();
+  if (newName) nameMap[id] = newName;
+  input.style.display = 'none';
+  input.previousElementSibling.style.display = '';
+  renderTable();
+}
+function cancelEdit(id) {
+  const input = document.getElementById('ninput-' + id);
+  input.value = nameMap[id];
+  input.style.display = 'none';
+  input.previousElementSibling.style.display = '';
+}
+
+// 住所編集
+function startAddressEdit(id) {
+  const wrap = document.getElementById('addr-wrap-' + id);
+  const input = document.getElementById('ainput-' + id);
+  wrap.style.display = 'none';
+  input.style.display = 'block';
+  input.focus(); input.select();
+}
+function endAddressEdit(id) {
+  const wrap = document.getElementById('addr-wrap-' + id);
+  const input = document.getElementById('ainput-' + id);
+  addressMap[id] = input.value.trim();
+  input.style.display = 'none';
+  wrap.style.display = 'flex';
+  renderTable();
+}
+function cancelAddressEdit(id) {
+  const wrap = document.getElementById('addr-wrap-' + id);
+  const input = document.getElementById('ainput-' + id);
+  input.value = addressMap[id] || '';
+  input.style.display = 'none';
+  wrap.style.display = 'flex';
+}
+
+function setOp(id, val, sel) {
+  operations[id] = val;
+  const row = document.getElementById('row-' + id);
+  if (val === 'delete') { row.classList.add('marked-delete'); sel.classList.add('delete'); }
+  else { row.classList.remove('marked-delete'); sel.classList.remove('delete'); }
+  document.getElementById('deleteCount').textContent = Object.values(operations).filter(v=>v==='delete').length;
+}
+
+function setOricon(id, val) { oriconMap[id] = val === 'true'; }
+function setBillboard(id, val) { billboardMap[id] = val === 'true'; }
+function setNewOricon(tid, val) { const s = newStores.find(s=>s.tempId===tid); if(s) s.oricon = val==='true'; }
+function setNewBillboard(tid, val) { const s = newStores.find(s=>s.tempId===tid); if(s) s.billboard = val==='true'; }
+function removeNew(tid) { newStores = newStores.filter(s=>s.tempId!==tid); renderTable(); }
+function filterTable() { renderTable(); }
+
+function markAllVisible(op) {
+  const search = document.getElementById('search').value.toLowerCase();
+  const filterPref = document.getElementById('filterPref').value;
+  allStores.forEach(s => {
+    if (filterPref && s.prefecture !== filterPref) return;
+    if (search && !nameMap[s.id].toLowerCase().includes(search) && !s.prefecture.includes(search)) return;
+    operations[s.id] = op;
+  });
+  renderTable();
+}
+
+function generateSQL() {
+  const toDelete = allStores.filter(s => operations[s.id] === 'delete');
+  const toRename = allStores.filter(s => operations[s.id] !== 'delete' && nameMap[s.id] !== s.name);
+  const toUpdateAddr = allStores.filter(s => operations[s.id] !== 'delete' && (addressMap[s.id]||'') !== (s.address||''));
+  const toUpdateOricon = allStores.filter(s => operations[s.id] !== 'delete' && oriconMap[s.id] !== s.oricon);
+  const toUpdateBillboard = allStores.filter(s => operations[s.id] !== 'delete' && billboardMap[s.id] !== s.billboard);
+  const hasChanges = toDelete.length || toRename.length || toUpdateAddr.length || toUpdateOricon.length || toUpdateBillboard.length || newStores.length;
+
+  if (!hasChanges) { alert('変更がありません'); return; }
+
+  let sql = `-- 生成日時: ${new Date().toLocaleString('ja-JP')}\n`;
+  sql += `-- 削除:${toDelete.length} 名前変更:${toRename.length} 住所変更:${toUpdateAddr.length} 新規追加:${newStores.length} オリコン変更:${toUpdateOricon.length} ビルボード変更:${toUpdateBillboard.length}\n\n`;
+
+  if (newStores.length > 0) {
+    sql += `-- ===== 新規店舗追加 =====\n`;
+    newStores.forEach(s => {
+      const n = s.name.replace(/'/g, "''");
+      const a = s.address ? s.address.replace(/'/g, "''") : null;
+      if (a) {
+        sql += `INSERT INTO stores (name, prefecture, prefecture_code, oricon, billboard, address) VALUES ('${n}', '${s.prefecture}', '${s.prefecture_code}', ${s.oricon}, ${s.billboard}, '${a}'); -- ${s.prefecture} / ${s.name}\n`;
+      } else {
+        sql += `INSERT INTO stores (name, prefecture, prefecture_code, oricon, billboard) VALUES ('${n}', '${s.prefecture}', '${s.prefecture_code}', ${s.oricon}, ${s.billboard}); -- ${s.prefecture} / ${s.name}\n`;
+      }
+    });
+    sql += '\n';
+  }
+
+  if (toRename.length > 0) {
+    sql += `-- ===== 店舗名変更 =====\n`;
+    toRename.forEach(s => {
+      const newN = nameMap[s.id].replace(/'/g, "''");
+      sql += `UPDATE stores SET name='${newN}' WHERE id='${s.id}'; -- ${s.name} → ${nameMap[s.id]}\n`;
+    });
+    sql += '\n';
+  }
+
+  if (toUpdateAddr.length > 0) {
+    sql += `-- ===== 住所更新 =====\n`;
+    toUpdateAddr.forEach(s => {
+      const addr = addressMap[s.id];
+      if (addr) {
+        const a = addr.replace(/'/g, "''");
+        sql += `UPDATE stores SET address='${a}' WHERE id='${s.id}'; -- ${nameMap[s.id]}\n`;
+      } else {
+        sql += `UPDATE stores SET address=NULL WHERE id='${s.id}'; -- ${nameMap[s.id]}\n`;
+      }
+    });
+    sql += '\n';
+  }
+
+  if (toDelete.length > 0) {
+    sql += `-- ===== 店舗削除 =====\n`;
+    const ids = toDelete.map(s => `'${s.id}'`).join(',\n  ');
+    sql += `DELETE FROM stores WHERE id IN (\n  ${ids}\n);\n\n`;
+    sql += `-- 削除される店舗:\n`;
+    toDelete.forEach(s => { sql += `-- ${s.prefecture} / ${s.name}\n`; });
+    sql += '\n';
+  }
+
+  if (toUpdateOricon.length > 0) {
+    sql += `-- ===== オリコン変更 =====\n`;
+    toUpdateOricon.forEach(s => { sql += `UPDATE stores SET oricon=${oriconMap[s.id]} WHERE id='${s.id}'; -- ${nameMap[s.id]}\n`; });
+    sql += '\n';
+  }
+
+  if (toUpdateBillboard.length > 0) {
+    sql += `-- ===== ビルボード変更 =====\n`;
+    toUpdateBillboard.forEach(s => { sql += `UPDATE stores SET billboard=${billboardMap[s.id]} WHERE id='${s.id}'; -- ${nameMap[s.id]}\n`; });
+  }
+
+  const box = document.getElementById('sqlBox');
+  box.style.display = 'block';
+  box.textContent = sql;
+  document.getElementById('copyBtn').style.display = 'inline-block';
+  window._generatedSQL = sql;
+  box.scrollIntoView({behavior: 'smooth'});
+}
+
+function copySQL() {
+  navigator.clipboard.writeText(window._generatedSQL || '').then(() => { alert('SQLをコピーしました！'); });
+}
+
+// ===== 住所自動取得 =====
+
+function isHighwayName(road) {
+  if (!road) return false;
+  return /国道|県道|都道|府道|道道|号線|高速|自動車道|臨港道路|環状線|バイパス/.test(road);
+}
+
+function formatJapaneseAddress(addr) {
+  if (!addr) return null;
+  const road = isHighwayName(addr.road) ? null : addr.road;
+  const parts = [
+    addr.state,
+    addr.county || addr.city || addr.town || addr.municipality,
+    addr.suburb || addr.neighbourhood || addr.quarter || addr.village,
+    road,
+    addr.house_number,
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join('') : null;
+}
+
+async function nominatimSearch(storeName, prefecture) {
+  const queries = [
+    `${storeName} ${prefecture} 日本`,
+    `${storeName} 日本`,
+  ];
+  for (const q of queries) {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&accept-language=ja&countrycodes=jp&addressdetails=1`;
+    const res = await fetch(url, { headers: { 'User-Agent': 'timelesz-zaiko-checker/1.0' } });
+    if (!res.ok) continue;
+    const results = await res.json();
+    if (results.length > 0) {
+      return formatJapaneseAddress(results[0].address);
+    }
+  }
+  return null;
+}
+
+async function autoFetchAddress(id, name, prefecture) {
+  const btn = document.getElementById('autobtn-' + id);
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = '⏳';
+
+  try {
+    const address = await nominatimSearch(name, prefecture);
+    if (address) {
+      addressMap[id] = address;
+      renderTable();
+    } else {
+      btn.textContent = '✗';
+      setTimeout(() => { btn.textContent = '🔍'; btn.disabled = false; }, 2000);
+      return;
+    }
+  } catch (e) {
+    btn.textContent = '✗';
+    setTimeout(() => { btn.textContent = '🔍'; btn.disabled = false; }, 2000);
+  }
+}
+
+async function bulkAutoFetch() {
+  const targets = allStores.filter(s => operations[s.id] !== 'delete' && !(addressMap[s.id]));
+  if (targets.length === 0) { alert('住所未登録の店舗がありません'); return; }
+
+  const ok = confirm(`住所未登録の${targets.length}件を自動取得します。\n約${Math.ceil(targets.length * 1.2 / 60)}分かかります。よろしいですか？`);
+  if (!ok) return;
+
+  const bulkBtn = document.getElementById('bulkBtn');
+  bulkBtn.disabled = true;
+
+  let done = 0;
+  for (const s of targets) {
+    bulkBtn.textContent = `⏳ 自動取得中... ${done}/${targets.length}件`;
+    try {
+      const address = await nominatimSearch(s.name, s.prefecture);
+      if (address) {
+        addressMap[s.id] = address;
+        done++;
+      }
+    } catch (e) {}
+    // Nominatim レート制限: 1リクエスト/秒
+    await new Promise(r => setTimeout(r, 1200));
+  }
+
+  bulkBtn.disabled = false;
+  bulkBtn.textContent = '🤖 住所を一括自動取得（未登録のみ）';
+  renderTable();
+  alert(`完了: ${done}/${targets.length}件取得しました。\n「⚠️ SQL生成」でSupabaseに保存してください。`);
+}
+
+loadStores();
+loadSalesCount();
+loadVisitStats();
+
+async function loadVisitStats() {
+  const el = document.getElementById('visitStats');
+  el.textContent = '読み込み中...';
+  try {
+    // 累計
+    const totalRes = await fetch(`${SUPABASE_URL}/rest/v1/visits?select=id`, {
+      headers: { ...HEADERS, 'Prefer': 'count=exact' }
+    });
+    const totalRange = totalRes.headers.get('content-range') || '';
+    const total = totalRange.split('/')[1] || '?';
+
+    // 日別（直近14日）
+    const since = new Date(Date.now() - 14*24*60*60*1000).toISOString();
+    const recentRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/visits?select=created_at&created_at=gte.${since}&order=created_at.desc&limit=5000`,
+      { headers: HEADERS }
+    );
+    const recent = await recentRes.json();
+
+    // 日別集計（JST = UTC+9）
+    const byDay = {};
+    recent.forEach(v => {
+      const jst = new Date(new Date(v.created_at).getTime() + 9*60*60*1000);
+      const day = jst.toISOString().slice(0, 10);
+      byDay[day] = (byDay[day] || 0) + 1;
+    });
+
+    const days = Object.keys(byDay).sort().reverse().slice(0, 10);
+    const tableRows = days.map(d => `<tr><td style="padding:2px 12px 2px 0">${d}</td><td style="font-weight:bold;color:#2c3e50">${byDay[d].toLocaleString()}人</td></tr>`).join('');
+
+    el.innerHTML = `
+      <div style="margin-bottom:10px;font-size:15px;font-weight:bold;color:#2c3e50">累計訪問者数: <span style="font-size:20px;color:#27ae60">${parseInt(total).toLocaleString()}人</span></div>
+      <table style="font-size:13px;border-collapse:collapse">
+        <tr><th style="text-align:left;padding:2px 12px 6px 0;color:#666;font-weight:normal">日付</th><th style="text-align:left;padding:2px 0 6px 0;color:#666;font-weight:normal">訪問者数</th></tr>
+        ${tableRows}
+      </table>
+      <div style="margin-top:8px;font-size:11px;color:#999">※同じブラウザでの重複アクセスは除外（セッション単位）</div>
+    `;
+  } catch(e) {
+    el.textContent = '❌ 取得失敗: ' + e.message;
+  }
+}
+
+async function loadSalesCount() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/song_stats?select=*&order=id.desc&limit=1`, { headers: HEADERS });
+  const data = await res.json();
+  if (Array.isArray(data) && data.length > 0) {
+    const s = data[0];
+    document.getElementById('oriconCount').value = s.own_count || '';
+    document.getElementById('billboardCount').value = s.billboard_count || '';
+    document.getElementById('targetCount').value = s.target || 500000;
+    document.getElementById('oriconDate').value = s.own_date || '';
+    document.getElementById('billboardDate').value = s.billboard_date || '';
+    document.getElementById('salesStatus').textContent = `現在値: オリコン ${(s.own_count||0).toLocaleString()}枚 / Billboard ${(s.billboard_count||0).toLocaleString()}枚`;
+  }
+}
+
+async function updateSalesCount() {
+  const own_count = parseInt(document.getElementById('oriconCount').value) || 0;
+  const billboard_count = parseInt(document.getElementById('billboardCount').value) || 0;
+  const target = parseInt(document.getElementById('targetCount').value) || 500000;
+  const statusEl = document.getElementById('salesStatus');
+  statusEl.textContent = '更新中...';
+  statusEl.style.color = '#666';
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/song_stats?id=eq.1`, {
+    method: 'PATCH',
+    headers: { ...HEADERS, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+    body: JSON.stringify({ own_count, billboard_count, target, own_date: document.getElementById('oriconDate').value || null, billboard_date: document.getElementById('billboardDate').value || null, updated_at: new Date().toISOString() })
+  });
+  if (res.ok) {
+    const ownPct = ((own_count / target) * 100).toFixed(1);
+    const bbPct = ((billboard_count / target) * 100).toFixed(1);
+    statusEl.textContent = `✅ 更新完了！ オリコン ${own_count.toLocaleString()}枚 (${ownPct}%) / Billboard ${billboard_count.toLocaleString()}枚 (${bbPct}%)`;
+    statusEl.style.color = '#27ae60';
+  } else {
+    statusEl.textContent = '❌ 更新失敗。Supabaseの権限を確認してください。';
+    statusEl.style.color = '#e74c3c';
+  }
+}
+</script>
+</body>
+</html>
