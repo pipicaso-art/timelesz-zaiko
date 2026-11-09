@@ -64,7 +64,7 @@ export function ReservationCounter() {
       setTotal(sum);
       setTop3(data.slice(0, 3).map(r => r.count));
 
-      // 分布計算
+      // 分布計算（v2）
       const totalEntries = data.length;
       if (totalEntries > 0) {
         const dist: BucketResult[] = BUCKETS.map(bucket => {
