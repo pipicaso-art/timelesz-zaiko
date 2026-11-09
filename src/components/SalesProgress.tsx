@@ -71,11 +71,11 @@ export function SalesProgress() {
         <MemberWalkAnimation />
       </div>
       <div className="p-5">
+        <ReservationCounter />
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">📊 売上枚数</h2>
           <span className="text-xs text-gray-400">目標 {formatCount(stats.target)}枚</span>
         </div>
-        <ReservationCounter />
         <div className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-1.5">
