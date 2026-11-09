@@ -49,8 +49,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </a>
             <div className="flex items-center gap-4 text-sm text-gray-500">
               <span className="hidden sm:block">※ファンサイト（unofficial）</span>
-              <a href="/onlinestore" className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
-                オンライン購入
+              <a href="/onlinestore" className="text-red-600 hover:text-red-700 font-bold transition-colors">
+                🛒 オンライン予約
               </a>
             </div>
           </div>
