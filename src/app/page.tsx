@@ -17,6 +17,12 @@ export default function HomePage() {
           <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mb-1">ザユウノメイ</h1>
           <p className="text-xl sm:text-2xl font-bold text-gray-600 mb-3">/ 本当のことを言うと</p>
           <p className="text-gray-500 mb-4">2027年2月3日（水）発売</p>
+          <a
+            href="https://timelesz.lnk.to/honkoto_1125"
+            target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-purple-50 border border-purple-200 hover:bg-purple-100 text-purple-700 text-sm font-bold px-4 py-2 rounded-full transition-colors mb-4">
+            🎵 「本当のことを言うと」先行配信中
+          </a>
           <ReleaseCountdown />
           <SalesProgress />
           <div className="mt-5">
