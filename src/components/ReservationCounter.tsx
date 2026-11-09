@@ -38,6 +38,7 @@ export function ReservationCounter() {
   const [error, setError] = useState('');
   const [mySubmission, setMySubmission] = useState<{ id: string; count: number } | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteCount, setDeleteCount] = useState('');
 
   useEffect(() => {
     const stored = sessionStorage.getItem('reservation_submission');
@@ -106,17 +107,35 @@ export function ReservationCounter() {
   }
 
   async function handleDelete() {
-    if (!mySubmission) return;
     setDeleteLoading(true);
+    setError('');
     try {
-      await fetch(`${SUPABASE_URL}/rest/v1/reservations?id=eq.${mySubmission.id}`, {
-        method: 'DELETE',
-        headers: SUPABASE_HEADERS,
-      });
-      sessionStorage.removeItem('reservation_submission');
-      setMySubmission(null);
-      setSubmitted(false);
-      setInputCount('');
+      if (mySubmission) {
+        // sessionStorageにIDがある場合はIDで削除
+        await fetch(`${SUPABASE_URL}/rest/v1/reservations?id=eq.${mySubmission.id}`, {
+          method: 'DELETE',
+          headers: SUPABASE_HEADERS,
+        });
+        sessionStorage.removeItem('reservation_submission');
+        setMySubmission(null);
+        setSubmitted(false);
+        setInputCount('');
+      } else {
+        // 枚数で検索して削除
+        const n = parseInt(deleteCount);
+        if (!n || n < 1) { setError('削除する枚数を入力してください'); setDeleteLoading(false); return; }
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/reservations?count=eq.${n}&limit=1`,
+          { headers: SUPABASE_HEADERS }
+        );
+        const rows = await res.json();
+        if (!Array.isArray(rows) || rows.length === 0) { setError('該当する申告が見つかりません'); setDeleteLoading(false); return; }
+        await fetch(`${SUPABASE_URL}/rest/v1/reservations?id=eq.${rows[0].id}`, {
+          method: 'DELETE',
+          headers: SUPABASE_HEADERS,
+        });
+        setDeleteCount('');
+      }
       await load();
     } catch {
       setError('削除に失敗しました');
@@ -192,21 +211,41 @@ export function ReservationCounter() {
         </div>
       )}
 
-      {/* 前回の申告を削除 */}
-      {mySubmission && (
-        <div className="flex items-center gap-2 mt-2 bg-white border border-purple-100 rounded-lg px-3 py-2">
-          <span className="text-xs text-gray-500 flex-1">
-            前回の申告：<span className="font-bold text-purple-700">{mySubmission.count.toLocaleString()}枚</span>
-          </span>
-          <button
-            onClick={handleDelete}
-            disabled={deleteLoading}
-            className="text-xs text-red-500 hover:text-red-700 border border-red-200 hover:border-red-400 px-3 py-1 rounded-lg transition-colors whitespace-nowrap"
-          >
-            {deleteLoading ? '削除中…' : '削除する'}
-          </button>
-        </div>
-      )}
+      {/* 削除セクション（常時表示） */}
+      <div className="mt-2">
+        {mySubmission ? (
+          <div className="flex items-center gap-2 bg-white border border-purple-100 rounded-lg px-3 py-2">
+            <span className="text-xs text-gray-400 flex-1">
+              申告済み：<span className="font-bold text-purple-600">{mySubmission.count.toLocaleString()}枚</span>
+            </span>
+            <button
+              onClick={handleDelete}
+              disabled={deleteLoading}
+              className="text-xs text-red-400 hover:text-red-600 border border-red-200 hover:border-red-400 px-2 py-1 rounded-lg transition-colors whitespace-nowrap"
+            >
+              {deleteLoading ? '削除中…' : '削除する'}
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5">
+            <input
+              type="number"
+              min={1}
+              value={deleteCount}
+              onChange={e => setDeleteCount(e.target.value)}
+              placeholder="申告を削除（枚数入力）"
+              className="flex-1 border border-purple-100 rounded-lg px-2 py-1 text-xs text-center focus:outline-none focus:ring-1 focus:ring-purple-200 text-gray-500"
+            />
+            <button
+              onClick={handleDelete}
+              disabled={deleteLoading}
+              className="text-xs text-red-400 hover:text-red-600 border border-red-200 hover:border-red-400 px-2 py-1 rounded-lg transition-colors whitespace-nowrap"
+            >
+              {deleteLoading ? '削除中…' : '削除する'}
+            </button>
+          </div>
+        )}
+      </div>
 
       {error && <p className="text-xs text-red-500 mt-2 text-center">{error}</p>}
 
