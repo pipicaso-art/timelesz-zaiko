@@ -126,6 +126,46 @@ interface BucketResult {
   count: number;
 }
 
+const FUMA_QUOTES = [
+  'オレたちにできない・やらないはない',
+  '夢、全部叶えるぞーーー！',
+  '俺は死ぬほど売れたい。こんなんじゃ売れねぇだろ',
+  '予約忘れてるようじゃ無理か',
+  '自信ないぐらいがちょうどいい',
+  '僕が必ず背中押しますから',
+  '人生につまらない日はないからね',
+];
+
+// 10×13 ピクセルアート（紫シャツキャラ）
+const PIXEL_FRAME = [
+  [0,0,3,3,3,3,3,3,0,0],
+  [0,3,3,3,3,3,3,3,3,0],
+  [3,1,1,1,1,1,1,1,1,3],
+  [1,1,1,4,1,1,4,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1],
+  [1,1,6,6,6,6,6,6,1,1],
+  [1,1,1,1,1,1,1,1,1,1],
+  [0,2,2,2,2,2,2,2,2,0],
+  [2,2,2,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2,2,0],
+  [0,0,5,5,0,0,5,5,0,0],
+  [0,0,4,4,0,0,4,4,0,0],
+  [0,0,0,0,0,0,0,0,0,0],
+];
+const PIXEL_COLORS: Record<number, string> = {
+  1: '#FFCC99', 2: '#8B5CF6', 3: '#1A1A1A', 4: '#222222', 5: '#1E3A6E', 6: '#CC3333',
+};
+function FumaPixelChar({ scale = 2 }: { scale?: number }) {
+  const rects: JSX.Element[] = [];
+  PIXEL_FRAME.forEach((row, r) =>
+    row.forEach((v, c) => {
+      if (v === 0) return;
+      rects.push(<rect key={`${r}-${c}`} x={c * scale} y={r * scale} width={scale} height={scale} fill={PIXEL_COLORS[v]}/>);
+    })
+  );
+  return <svg viewBox={`0 0 ${10 * scale} ${13 * scale}`} width={10 * scale} height={13 * scale}>{rects}</svg>;
+}
+
 export function ReservationCounter() {
   const [total, setTotal] = useState<number>(0);
   const [top3, setTop3] = useState<number[]>([]);
@@ -138,6 +178,7 @@ export function ReservationCounter() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteCount, setDeleteCount] = useState('');
   const [showCelebration, setShowCelebration] = useState(false);
+  const [quoteIndex, setQuoteIndex] = useState(0);
   const celebrationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -200,6 +241,7 @@ export function ReservationCounter() {
         setMySubmission(submission);
       }
       setSubmitted(true);
+      setQuoteIndex(Math.floor(Math.random() * FUMA_QUOTES.length));
       setShowCelebration(true);
       if (celebrationTimer.current) clearTimeout(celebrationTimer.current);
       celebrationTimer.current = setTimeout(() => setShowCelebration(false), 2800);
@@ -336,9 +378,13 @@ export function ReservationCounter() {
 
       {/* 入力フォーム */}
       {submitted ? (
-        <div className="text-center bg-white rounded-lg py-3 border border-purple-100">
-          <p className="text-purple-700 font-bold text-sm">🎉 ありがとうございます！</p>
-          <p className="text-xs text-gray-400 mt-1">カウントに追加されました</p>
+        <div className="bg-white rounded-lg py-3 px-4 border border-purple-100 flex items-center gap-3">
+          <div className="shrink-0">
+            <FumaPixelChar scale={3} />
+          </div>
+          <p className="text-purple-800 font-bold text-sm leading-snug">
+            {FUMA_QUOTES[quoteIndex]}
+          </p>
         </div>
       ) : (
         <div className="flex items-center gap-2">
