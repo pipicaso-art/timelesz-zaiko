@@ -5,37 +5,89 @@ import { SUPABASE_URL, SUPABASE_HEADERS } from '@/lib/supabase';
 
 function FluffyDog() {
   return (
-    <svg viewBox="0 0 80 90" width="100" height="112" xmlns="http://www.w3.org/2000/svg">
-      {/* 胴体 */}
-      <circle cx="22" cy="68" r="12" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
-      <circle cx="58" cy="68" r="12" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
-      <ellipse cx="40" cy="62" r="22" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
-      {/* 前足 */}
-      <circle cx="26" cy="80" r="10" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
-      <circle cx="54" cy="80" r="10" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
-      {/* 頭 */}
-      <circle cx="40" cy="34" r="21" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
-      {/* ふわふわ毛 */}
-      <circle cx="18" cy="24" r="13" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
-      <circle cx="28" cy="14" r="13" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
-      <circle cx="40" cy="11" r="13" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
-      <circle cx="52" cy="14" r="13" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
-      <circle cx="62" cy="24" r="13" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
+    <svg viewBox="0 0 120 128" width="120" height="128" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>{`
+          @keyframes tongueWag {
+            0%,100% { transform: scaleY(1) rotate(0deg); }
+            25%      { transform: scaleY(1.18) rotate(-4deg); }
+            75%      { transform: scaleY(1.18) rotate(4deg); }
+          }
+          @keyframes earL {
+            0%,100% { transform: rotate(0deg); }
+            40%      { transform: rotate(-8deg); }
+            70%      { transform: rotate(5deg); }
+          }
+          @keyframes earR {
+            0%,100% { transform: rotate(0deg); }
+            40%      { transform: rotate(8deg); }
+            70%      { transform: rotate(-5deg); }
+          }
+          .dog-tongue { transform-origin: 60px 68px; animation: tongueWag 0.7s ease-in-out infinite; }
+          .dog-ear-l  { transform-origin: 28px 42px; animation: earL 0.9s ease-in-out infinite; }
+          .dog-ear-r  { transform-origin: 92px 42px; animation: earR 0.9s ease-in-out infinite 0.1s; }
+        `}</style>
+      </defs>
+
+      {/* ===== 胴体 ===== */}
+      {/* 体メイン */}
+      <ellipse cx="60" cy="104" rx="26" ry="22" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      {/* 体のふわふわ輪郭 */}
+      <circle cx="36" cy="102" r="16" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      <circle cx="84" cy="102" r="16" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      <circle cx="48" cy="94"  r="14" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      <circle cx="72" cy="94"  r="14" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      {/* 前足（丸いパフ） */}
+      <circle cx="40" cy="118" r="14" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      <circle cx="80" cy="118" r="14" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      <circle cx="58" cy="121" r="11" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      <circle cx="62" cy="121" r="11" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+
+      {/* ===== 耳（ふわふわサイドバンプ、アニメあり） ===== */}
+      <g className="dog-ear-l">
+        <circle cx="20" cy="50" r="15" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+        <circle cx="14" cy="40" r="13" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+        <circle cx="22" cy="34" r="12" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      </g>
+      <g className="dog-ear-r">
+        <circle cx="100" cy="50" r="15" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+        <circle cx="106" cy="40" r="13" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+        <circle cx="98"  cy="34" r="12" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      </g>
+
+      {/* ===== 頭のクラウドバンプ ===== */}
+      <circle cx="30" cy="38" r="17" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      <circle cx="90" cy="38" r="17" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      <circle cx="38" cy="22" r="17" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      <circle cx="60" cy="16" r="18" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      <circle cx="82" cy="22" r="17" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+      {/* 頭メイン */}
+      <circle cx="60" cy="52" r="30" fill="#faf8f6" stroke="#c9bfba" strokeWidth="1.1"/>
+
+      {/* ===== 顔パーツ ===== */}
       {/* 目 */}
-      <circle cx="33" cy="34" r="4" fill="#2d2020"/>
-      <circle cx="47" cy="34" r="4" fill="#2d2020"/>
-      <circle cx="34.2" cy="32.5" r="1.5" fill="white"/>
-      <circle cx="48.2" cy="32.5" r="1.5" fill="white"/>
+      <circle cx="49" cy="50" r="4.5" fill="#231515"/>
+      <circle cx="71" cy="50" r="4.5" fill="#231515"/>
+      <circle cx="50.5" cy="48.2" r="1.6" fill="white"/>
+      <circle cx="72.5" cy="48.2" r="1.6" fill="white"/>
       {/* 鼻 */}
-      <ellipse cx="40" cy="40" rx="3.5" ry="2.5" fill="#4a3030"/>
-      {/* 口 */}
-      <path d="M 36 44 Q 40 48 44 44" stroke="#4a3030" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-      {/* 舌 */}
-      <ellipse cx="40" cy="48" rx="5.5" ry="4.5" fill="#ffaaaa"/>
-      <line x1="40" y1="44" x2="40" y2="52" stroke="#ff9999" strokeWidth="1" strokeLinecap="round"/>
-      {/* ハート */}
-      <path d="M 62 10 C 62 8 60 6 58 8 C 56 6 54 8 54 10 C 54 13 58 16 58 16 C 58 16 62 13 62 10 Z" fill="#ffb3c6"/>
-      <path d="M 72 18 C 72 16.5 70.5 15 69 16.5 C 67.5 15 66 16.5 66 18 C 66 20 69 22 69 22 C 69 22 72 20 72 18 Z" fill="#ffb3c6"/>
+      <ellipse cx="60" cy="58" rx="4" ry="3" fill="#3a2020"/>
+      {/* 口の形 */}
+      <path d="M 53 62 Q 56.5 65 60 64 Q 63.5 65 67 62" stroke="#3a2020" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
+      {/* ベロ（アニメあり） */}
+      <g className="dog-tongue">
+        <ellipse cx="60" cy="69" rx="6" ry="5.5" fill="#f4a0a8"/>
+        <line x1="60" y1="64" x2="60" y2="74" stroke="#f08090" strokeWidth="1.1" strokeLinecap="round"/>
+      </g>
+
+      {/* ===== ピンクハート（右上） ===== */}
+      <path d="M 101 14 C 101 12 99 10 97 12 C 95 10 93 12 93 14 C 93 17 97 20 97 20 C 97 20 101 17 101 14 Z" fill="#f4b8c0"/>
+      <path d="M 112 22 C 112 20.5 110.5 19 109 20.5 C 107.5 19 106 20.5 106 22 C 106 24.5 109 27 109 27 C 109 27 112 24.5 112 22 Z" fill="#f4b8c0"/>
+
+      {/* ===== 毛並み線（ふわふわ感） ===== */}
+      <path d="M 48 80 Q 60 83 72 80" stroke="#c9bfba" strokeWidth="0.8" fill="none" strokeLinecap="round"/>
+      <path d="M 42 70 Q 38 76 36 85" stroke="#c9bfba" strokeWidth="0.8" fill="none" strokeLinecap="round"/>
+      <path d="M 78 70 Q 82 76 84 85" stroke="#c9bfba" strokeWidth="0.8" fill="none" strokeLinecap="round"/>
     </svg>
   );
 }
