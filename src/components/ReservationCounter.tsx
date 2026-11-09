@@ -40,33 +40,33 @@ function FluffyDog() {
       <g filter="url(#dogGoo)">
         {/* 耳（左）：アニメあり */}
         <g className="dg-ear-l">
-          <circle cx="16" cy="56" r="13" fill="#f9f7f5"/>
-          <circle cx="11" cy="45" r="12" fill="#f9f7f5"/>
-          <circle cx="20" cy="38" r="12" fill="#f9f7f5"/>
+          <circle cx="16" cy="56" r="13" fill="#ffffff"/>
+          <circle cx="11" cy="45" r="12" fill="#ffffff"/>
+          <circle cx="20" cy="38" r="12" fill="#ffffff"/>
         </g>
         {/* 耳（右）：アニメあり */}
         <g className="dg-ear-r">
-          <circle cx="104" cy="56" r="13" fill="#f9f7f5"/>
-          <circle cx="109" cy="45" r="12" fill="#f9f7f5"/>
-          <circle cx="100" cy="38" r="12" fill="#f9f7f5"/>
+          <circle cx="104" cy="56" r="13" fill="#ffffff"/>
+          <circle cx="109" cy="45" r="12" fill="#ffffff"/>
+          <circle cx="100" cy="38" r="12" fill="#ffffff"/>
         </g>
         {/* 頭クラウドバンプ（上）*/}
-        <circle cx="38"  cy="22" r="17" fill="#f9f7f5"/>
-        <circle cx="60"  cy="16" r="19" fill="#f9f7f5"/>
-        <circle cx="82"  cy="22" r="17" fill="#f9f7f5"/>
+        <circle cx="38"  cy="22" r="17" fill="#ffffff"/>
+        <circle cx="60"  cy="16" r="19" fill="#ffffff"/>
+        <circle cx="82"  cy="22" r="17" fill="#ffffff"/>
         {/* 頭クラウドバンプ（横）*/}
-        <circle cx="28"  cy="40" r="16" fill="#f9f7f5"/>
-        <circle cx="92"  cy="40" r="16" fill="#f9f7f5"/>
+        <circle cx="28"  cy="40" r="16" fill="#ffffff"/>
+        <circle cx="92"  cy="40" r="16" fill="#ffffff"/>
         {/* 頭メイン */}
-        <circle cx="60"  cy="52" r="30" fill="#f9f7f5"/>
+        <circle cx="60"  cy="52" r="30" fill="#ffffff"/>
         {/* 胴体 */}
-        <circle cx="60" cy="102" r="25" fill="#f9f7f5"/>
-        <circle cx="40"  cy="98" r="17" fill="#f9f7f5"/>
-        <circle cx="80"  cy="98" r="17" fill="#f9f7f5"/>
+        <circle cx="60" cy="102" r="25" fill="#ffffff"/>
+        <circle cx="40"  cy="98" r="17" fill="#ffffff"/>
+        <circle cx="80"  cy="98" r="17" fill="#ffffff"/>
         {/* 前足 */}
-        <circle cx="42" cy="119" r="15" fill="#f9f7f5"/>
-        <circle cx="78" cy="119" r="15" fill="#f9f7f5"/>
-        <circle cx="60" cy="121" r="13" fill="#f9f7f5"/>
+        <circle cx="42" cy="119" r="15" fill="#ffffff"/>
+        <circle cx="78" cy="119" r="15" fill="#ffffff"/>
+        <circle cx="60" cy="121" r="13" fill="#ffffff"/>
       </g>
 
       {/* ===== 毛並みテクスチャ（goo外・自然な線） ===== */}
@@ -79,8 +79,8 @@ function FluffyDog() {
 
       {/* ===== 顔パーツ ===== */}
       {/* 目 */}
-      <circle cx="50" cy="50" r="4.5" fill="#1a0e0e"/>
-      <circle cx="70" cy="50" r="4.5" fill="#1a0e0e"/>
+      <circle cx="50" cy="50" r="4.5" fill="#000000"/>
+      <circle cx="70" cy="50" r="4.5" fill="#000000"/>
       <circle cx="51.5" cy="48.3" r="1.6" fill="white"/>
       <circle cx="71.5" cy="48.3" r="1.6" fill="white"/>
       {/* 鼻 */}
@@ -90,8 +90,8 @@ function FluffyDog() {
         stroke="#2a1414" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
       {/* ベロ（アニメあり） */}
       <g className="dg-tongue">
-        <ellipse cx="60" cy="69.5" rx="6.5" ry="5.5" fill="#f09aaa"/>
-        <line x1="60" y1="65" x2="60" y2="75" stroke="#e08898" strokeWidth="1.2" strokeLinecap="round"/>
+        <ellipse cx="60" cy="68.5" rx="4.5" ry="3.8" fill="#f09aaa"/>
+        <line x1="60" y1="65" x2="60" y2="72" stroke="#e08898" strokeWidth="1.0" strokeLinecap="round"/>
       </g>
 
       {/* ===== ピンクハート ===== */}
@@ -170,7 +170,8 @@ export function ReservationCounter() {
       if (totalEntries > 0) {
         const dist: BucketResult[] = BUCKETS.map(bucket => {
           const cnt = data.filter(r => r.count >= bucket.min && r.count <= bucket.max).length;
-          return { label: bucket.label, count: cnt, pct: Math.round((cnt / totalEntries) * 100) };
+          const pct = Math.round((cnt / totalEntries) * 1000) / 10; // 小数点1桁
+          return { label: bucket.label, count: cnt, pct };
         });
         setDistribution(dist);
       }
@@ -412,10 +413,12 @@ export function ReservationCounter() {
                 <div className="flex-1 h-2.5 bg-purple-100 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-purple-400 rounded-full transition-all"
-                    style={{ width: b.pct === 0 ? '0%' : `${Math.max((b.pct / maxPct) * 100, 4)}%` }}
+                    style={{ width: b.count === 0 ? '0%' : `${Math.max((b.pct / maxPct) * 100, 4)}%` }}
                   />
                 </div>
-                <span className="text-xs font-bold text-purple-700 w-9 text-right">{b.pct}%</span>
+                <span className="text-xs font-bold text-purple-700 w-12 text-right">
+                  {b.count === 0 ? '0%' : b.pct < 0.1 ? '<0.1%' : `${b.pct}%`}
+                </span>
               </div>
             ))}
           </div>
