@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { MemberWalkAnimation } from './MemberWalkAnimation';
+import { ReservationCounter } from './ReservationCounter';
 import { SUPABASE_URL, SUPABASE_HEADERS } from '@/lib/supabase';
 
 interface SongStats {
@@ -74,6 +75,7 @@ export function SalesProgress() {
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">📊 売上枚数</h2>
           <span className="text-xs text-gray-400">目標 {formatCount(stats.target)}枚</span>
         </div>
+        <ReservationCounter />
         <div className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-1.5">

@@ -22,23 +22,6 @@ export default function HomePage() {
           </a>
           <ReleaseCountdown />
           <SalesProgress />
-          <div className="mt-5">
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">発売CDの種類</p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: '初回限定盤A', desc: 'CD+Blu-ray/DVD' },
-                { label: '初回限定盤B', desc: 'CD+Blu-ray/DVD' },
-                { label: '通常盤', desc: 'CD only' },
-                { label: 'FC会員限定盤', desc: 'CD+Blu-ray/DVD' },
-              ].map((ed) => (
-                <div key={ed.label} className="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 text-center">
-                  <div className="text-base leading-none mb-1">💿</div>
-                  <div className="font-black text-sm text-gray-900 leading-tight">{ed.label}</div>
-                  <div className="text-gray-500 text-xs mt-0.5">{ed.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
           <p className="text-xs text-gray-400 mt-2 text-center">※3形態同時予約購入特典あり（詳細後日解禁）</p>
           <p className="text-xs text-gray-400 mt-1 text-center">※FC会員限定盤は受注生産限定（予約期間：〜2026/12/21）</p>
         </div>
