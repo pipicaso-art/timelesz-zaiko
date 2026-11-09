@@ -3,9 +3,6 @@
 import { useEffect, useState } from 'react';
 import { SUPABASE_URL, SUPABASE_HEADERS } from '@/lib/supabase';
 
-// 予約入力フォームを表示する期間（11/9〜11/15）
-const FORM_UNTIL = new Date('2026-11-16T00:00:00+09:00');
-
 interface ReservationRow {
   id: string;
   count: number;
@@ -18,7 +15,6 @@ export function ReservationCounter() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const showForm = new Date() < FORM_UNTIL;
 
   async function load() {
     try {
@@ -69,9 +65,6 @@ export function ReservationCounter() {
         <h3 className="text-sm font-black text-purple-900 tracking-wide">
           本当のことを言うとこんなに予約しました
         </h3>
-        {showForm && (
-          <span className="ml-auto text-xs text-purple-400 font-medium">11/9〜11/15</span>
-        )}
       </div>
 
       {/* 合計枚数 */}
@@ -97,36 +90,34 @@ export function ReservationCounter() {
         </div>
       )}
 
-      {/* 入力フォーム */}
-      {showForm && (
-        submitted ? (
-          <div className="text-center bg-white rounded-lg py-3 border border-purple-100">
-            <p className="text-purple-700 font-bold text-sm">🎉 ありがとうございます！</p>
-            <p className="text-xs text-gray-400 mt-1">カウントに追加されました</p>
+      {/* 入力フォーム（常時表示） */}
+      {submitted ? (
+        <div className="text-center bg-white rounded-lg py-3 border border-purple-100">
+          <p className="text-purple-700 font-bold text-sm">🎉 ありがとうございます！</p>
+          <p className="text-xs text-gray-400 mt-1">カウントに追加されました</p>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <div className="flex-1 relative">
+            <input
+              type="number"
+              min={1}
+              max={999}
+              value={inputCount}
+              onChange={e => setInputCount(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+              placeholder="予約枚数を入力"
+              className="w-full border border-purple-200 rounded-lg px-3 py-2 text-sm text-center font-bold focus:outline-none focus:ring-2 focus:ring-purple-300"
+            />
           </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <div className="flex-1 relative">
-              <input
-                type="number"
-                min={1}
-                max={999}
-                value={inputCount}
-                onChange={e => setInputCount(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-                placeholder="予約枚数を入力"
-                className="w-full border border-purple-200 rounded-lg px-3 py-2 text-sm text-center font-bold focus:outline-none focus:ring-2 focus:ring-purple-300"
-              />
-            </div>
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white text-sm font-black px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
-            >
-              {loading ? '送信中…' : '予約した！'}
-            </button>
-          </div>
-        )
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white text-sm font-black px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
+          >
+            {loading ? '送信中…' : '予約した！'}
+          </button>
+        </div>
       )}
       {error && <p className="text-xs text-red-500 mt-1 text-center">{error}</p>}
     </div>

@@ -8,12 +8,12 @@ export default function HomePage() {
     <main className="max-w-7xl mx-auto px-4 py-6 flex gap-6">
       <div className="flex-1 min-w-0 space-y-6">
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <p className="text-emerald-600 text-sm font-bold uppercase tracking-widest mb-2">
-            timelesz 30th Single
+          <p className="text-sm font-bold text-gray-900 tracking-widest mb-3">
+            2027.02.03 RELEASE &nbsp;/&nbsp; SINGLE
           </p>
-          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mb-1">ザユウノメイ</h1>
-          <p className="text-xl sm:text-2xl font-bold text-gray-600 mb-3">/ 本当のことを言うと</p>
-          <p className="text-gray-500 mb-4">2027年2月3日（水）発売</p>
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mb-1">ザユウノメイ /</h1>
+          <p className="text-3xl sm:text-4xl font-black text-gray-900 mb-2">本当のことを言うと</p>
+          <p className="text-base italic text-gray-500 mb-4">timelesz</p>
           <a
             href="https://timelesz.lnk.to/honkoto_1125"
             target="_blank" rel="noopener noreferrer"
@@ -60,9 +60,9 @@ export default function HomePage() {
         </div>
 
         <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
-            <a href="/onlinestore" className="hover:text-emerald-600 transition-colors">
-              オンラインで購入はこちらから →
+          <h2 className="text-xl font-bold mb-2">
+            <a href="/onlinestore" className="text-red-600 hover:text-red-700 transition-colors">
+              🛒 オンライン予約はこちらから →
             </a>
           </h2>
         </div>
