@@ -33,7 +33,7 @@ export default function HomePage() {
               className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold px-4 py-2 rounded-full transition-colors">
               ✏️ まず練習！
             </a>
-            <a href="https://x.com/intent/tweet?text=%23TSZ%E5%9C%A8%E5%BA%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC%20%23TSZ%E5%9C%A8%E5%BA%AB%E6%83%85%E5%A0%B1_%E3%82%B6%E3%83%A6%E3%82%A6%E3%83%8E%E3%83%A1%E3%82%A4%20%23timelesz_%E3%82%B6%E3%83%A6%E3%82%A6%C3%97%E3%81%BB%E3%82%93%E3%81%93%E3%81%A8%20https%3A%2F%2Ftimelesz-zaiko-static.pages.dev"
+            <a href="https://x.com/intent/tweet?text=%23TSZ%E5%9C%A8%E5%BA%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC%20%23TSZ%E5%9C%A8%E5%BA%AB%E6%83%85%E5%A0%B1_%E3%82%B6%E3%83%A6%E3%82%A6%E3%83%8E%E3%83%A1%E3%82%A4%20%23timelesz_%E3%82%B6%E3%83%A6%E3%82%A6%C3%97%E3%81%BB%E3%82%93%E3%81%93%E3%81%A8%20%23TSZ%E5%9C%A8%E5%BA%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC_%E3%82%B6%E3%83%A6%E3%82%A6%C3%97%E3%81%BB%E3%82%93%E3%81%93%E3%81%A8%20https%3A%2F%2Ftimelesz-zaiko-static.pages.dev"
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white text-sm font-bold px-4 py-2 rounded-full transition-colors">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@ export default function HomePage() {
               </svg>
               ポスト（リンク付き）
             </a>
-            <a href="https://x.com/intent/tweet?text=%23TSZ%E5%9C%A8%E5%BA%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC%20%23TSZ%E5%9C%A8%E5%BA%AB%E6%83%85%E5%A0%B1_%E3%82%B6%E3%83%A6%E3%82%A6%E3%83%8E%E3%83%A1%E3%82%A4%20%23timelesz_%E3%82%B6%E3%83%A6%E3%82%A6%C3%97%E3%81%BB%E3%82%93%E3%81%93%E3%81%A8"
+            <a href="https://x.com/intent/tweet?text=%23TSZ%E5%9C%A8%E5%BA%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC%20%23TSZ%E5%9C%A8%E5%BA%AB%E6%83%85%E5%A0%B1_%E3%82%B6%E3%83%A6%E3%82%A6%E3%83%8E%E3%83%A1%E3%82%A4%20%23timelesz_%E3%82%B6%E3%83%A6%E3%82%A6%C3%97%E3%81%BB%E3%82%93%E3%81%93%E3%81%A8%20%23TSZ%E5%9C%A8%E5%BA%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC_%E3%82%B6%E3%83%A6%E3%82%A6%C3%97%E3%81%BB%E3%82%93%E3%81%93%E3%81%A8"
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-bold px-4 py-2 rounded-full transition-colors">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
