@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-const RELEASE_DATE = new Date('2026-07-29T00:00:00+09:00');
+const RELEASE_DATE = new Date('2027-02-03T00:00:00+09:00');
 
 export function ReleaseCountdown() {
   const [daysUntil, setDaysUntil] = useState<number | null>(null);

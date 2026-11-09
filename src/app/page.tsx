@@ -3,30 +3,30 @@ import { PrefectureList } from '@/components/PrefectureList';
 import { SalesProgress } from '@/components/SalesProgress';
 import { ReleaseCountdown } from '@/components/ReleaseCountdown';
 import { WelcomeFireworks } from '@/components/WelcomeFireworks';
-import { CelebrationFloats } from '@/components/CelebrationFloats';
 
 export default function HomePage() {
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-6 flex gap-6">
       <WelcomeFireworks />
-      <CelebrationFloats />
       <div className="flex-1 min-w-0 space-y-6">
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
           <p className="text-emerald-600 text-sm font-bold uppercase tracking-widest mb-2">
-            timelesz 29th Single
+            timelesz 30th Single
           </p>
-          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mb-3">消えない花火</h1>
-          <p className="text-gray-500 mb-4">2026年7月29日（水）発売</p>
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mb-1">ザユウノメイ</h1>
+          <p className="text-xl sm:text-2xl font-bold text-gray-600 mb-3">/ 本当のことを言うと</p>
+          <p className="text-gray-500 mb-4">2027年2月3日（水）発売</p>
           <ReleaseCountdown />
           <SalesProgress />
           <div className="mt-5">
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">発売CDの種類</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: '初回限定盤A', desc: 'CD+DVD' },
-                { label: '初回限定盤B', desc: 'CD+DVD' },
+                { label: '初回限定盤A', desc: 'CD+Blu-ray/DVD' },
+                { label: '初回限定盤B', desc: 'CD+Blu-ray/DVD' },
                 { label: '通常盤', desc: 'CD only' },
+                { label: 'FC会員限定盤', desc: 'CD+Blu-ray/DVD' },
               ].map((ed) => (
                 <div key={ed.label} className="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 text-center">
                   <div className="text-base leading-none mb-1">💿</div>
@@ -36,11 +36,8 @@ export default function HomePage() {
               ))}
             </div>
           </div>
-          <p className="text-xs text-gray-400 mt-2 text-center">※3形態同時購入で特典あり</p>
-          <div className="mt-3 flex flex-wrap gap-2 text-xs text-gray-500">
-            <span>🌐 UNIVERSAL MUSIC STORE限定盤（申し込み終了）</span>
-            <span>🎪 ツアー会場限定版（会場のみ）</span>
-          </div>
+          <p className="text-xs text-gray-400 mt-2 text-center">※3形態同時予約購入特典あり（詳細後日解禁）</p>
+          <p className="text-xs text-gray-400 mt-1 text-center">※FC会員限定盤は受注生産限定（予約期間：〜2026/12/21）</p>
         </div>
 
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
@@ -50,7 +47,7 @@ export default function HomePage() {
               className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold px-4 py-2 rounded-full transition-colors">
               ✏️ まず練習！
             </a>
-            <a href="https://x.com/intent/tweet?text=%23TSZ%E5%9C%A8%E5%BA%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC%20%23TSZ%E5%9C%A8%E5%BA%AB%E6%83%85%E5%A0%B1_%E6%B6%88%E3%81%88%E3%81%AA%E3%81%84%E8%8A%B1%E7%81%AB%20https%3A%2F%2Ftimelesz-zaiko-static.pages.dev"
+            <a href="https://x.com/intent/tweet?text=%23TSZ%E5%9C%A8%E5%BA%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC%20%23TSZ%E5%9C%A8%E5%BA%AB%E6%83%85%E5%A0%B1_%E3%82%B6%E3%83%A6%E3%82%A6%E3%83%8E%E3%83%A1%E3%82%A4%20https%3A%2F%2Ftimelesz-zaiko-static.pages.dev"
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white text-sm font-bold px-4 py-2 rounded-full transition-colors">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -58,7 +55,7 @@ export default function HomePage() {
               </svg>
               ポスト（リンク付き）
             </a>
-            <a href="https://x.com/intent/tweet?text=%23TSZ%E5%9C%A8%E5%BA%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC%20%23TSZ%E5%9C%A8%E5%BA%AB%E6%83%85%E5%A0%B1_%E6%B6%88%E3%81%88%E3%81%AA%E3%81%84%E8%8A%B1%E7%81%AB"
+            <a href="https://x.com/intent/tweet?text=%23TSZ%E5%9C%A8%E5%BA%AB%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC%20%23TSZ%E5%9C%A8%E5%BA%AB%E6%83%85%E5%A0%B1_%E3%82%B6%E3%83%A6%E3%82%A6%E3%83%8E%E3%83%A1%E3%82%A4"
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-bold px-4 py-2 rounded-full transition-colors">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

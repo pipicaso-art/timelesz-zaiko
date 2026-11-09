@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://timelesz-zaiko-static.pages.dev'),
   title: 'TSZ在庫チェッカー',
   description: '発売されるtimeleszのCD在庫状況を全国のファンで共有！みんなで作るファンサイトです',
-  keywords: 'timelesz,在庫チェッカー,CD在庫,消えない花火',
+  keywords: 'timelesz,在庫チェッカー,CD在庫,ザユウノメイ,本当のことを言うと',
   themeColor: '#2DD4BF',
   openGraph: {
     title: 'TSZ在庫チェッカー',
