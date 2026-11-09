@@ -1,7 +1,44 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SUPABASE_URL, SUPABASE_HEADERS } from '@/lib/supabase';
+
+function FluffyDog() {
+  return (
+    <svg viewBox="0 0 80 90" width="100" height="112" xmlns="http://www.w3.org/2000/svg">
+      {/* 胴体 */}
+      <circle cx="22" cy="68" r="12" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
+      <circle cx="58" cy="68" r="12" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
+      <ellipse cx="40" cy="62" r="22" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
+      {/* 前足 */}
+      <circle cx="26" cy="80" r="10" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
+      <circle cx="54" cy="80" r="10" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
+      {/* 頭 */}
+      <circle cx="40" cy="34" r="21" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
+      {/* ふわふわ毛 */}
+      <circle cx="18" cy="24" r="13" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
+      <circle cx="28" cy="14" r="13" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
+      <circle cx="40" cy="11" r="13" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
+      <circle cx="52" cy="14" r="13" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
+      <circle cx="62" cy="24" r="13" fill="#f5f5f5" stroke="#d0d0d0" strokeWidth="1.2"/>
+      {/* 目 */}
+      <circle cx="33" cy="34" r="4" fill="#2d2020"/>
+      <circle cx="47" cy="34" r="4" fill="#2d2020"/>
+      <circle cx="34.2" cy="32.5" r="1.5" fill="white"/>
+      <circle cx="48.2" cy="32.5" r="1.5" fill="white"/>
+      {/* 鼻 */}
+      <ellipse cx="40" cy="40" rx="3.5" ry="2.5" fill="#4a3030"/>
+      {/* 口 */}
+      <path d="M 36 44 Q 40 48 44 44" stroke="#4a3030" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+      {/* 舌 */}
+      <ellipse cx="40" cy="48" rx="5.5" ry="4.5" fill="#ffaaaa"/>
+      <line x1="40" y1="44" x2="40" y2="52" stroke="#ff9999" strokeWidth="1" strokeLinecap="round"/>
+      {/* ハート */}
+      <path d="M 62 10 C 62 8 60 6 58 8 C 56 6 54 8 54 10 C 54 13 58 16 58 16 C 58 16 62 13 62 10 Z" fill="#ffb3c6"/>
+      <path d="M 72 18 C 72 16.5 70.5 15 69 16.5 C 67.5 15 66 16.5 66 18 C 66 20 69 22 69 22 C 69 22 72 20 72 18 Z" fill="#ffb3c6"/>
+    </svg>
+  );
+}
 
 interface ReservationRow {
   id: string;
@@ -39,6 +76,8 @@ export function ReservationCounter() {
   const [mySubmission, setMySubmission] = useState<{ id: string; count: number } | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteCount, setDeleteCount] = useState('');
+  const [showCelebration, setShowCelebration] = useState(false);
+  const celebrationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const stored = sessionStorage.getItem('reservation_submission');
@@ -99,6 +138,9 @@ export function ReservationCounter() {
         setMySubmission(submission);
       }
       setSubmitted(true);
+      setShowCelebration(true);
+      if (celebrationTimer.current) clearTimeout(celebrationTimer.current);
+      celebrationTimer.current = setTimeout(() => setShowCelebration(false), 2800);
       await load();
     } catch {
       setError('送信に失敗しました');
@@ -147,7 +189,55 @@ export function ReservationCounter() {
   const maxPct = Math.max(...distribution.map(b => b.pct), 1);
 
   return (
-    <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4 mb-4">
+    <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4 mb-4 relative">
+      {/* お祝いアニメーション */}
+      {showCelebration && (
+        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+          <style>{`
+            @keyframes dogFloat {
+              0%   { transform: translateY(100px) scale(0.8); opacity: 0; }
+              15%  { opacity: 1; }
+              60%  { transform: translateY(-80px) scale(1.1); opacity: 1; }
+              100% { transform: translateY(-160px) scale(1); opacity: 0; }
+            }
+            @keyframes dotFloat1 {
+              0%   { transform: translateY(0) scale(0); opacity: 0; }
+              10%  { opacity: 0.9; transform: translateY(0) scale(1); }
+              100% { transform: translateY(-220px) scale(0.6); opacity: 0; }
+            }
+            @keyframes dotFloat2 {
+              0%   { transform: translateY(0) scale(0); opacity: 0; }
+              15%  { opacity: 0.8; transform: translateY(0) scale(1); }
+              100% { transform: translateY(-180px) scale(0.5); opacity: 0; }
+            }
+            @keyframes dotFloat3 {
+              0%   { transform: translateY(0) scale(0); opacity: 0; }
+              20%  { opacity: 0.9; transform: translateY(0) scale(1); }
+              100% { transform: translateY(-200px) scale(0.4); opacity: 0; }
+            }
+            .dog-anim { animation: dogFloat 2.6s ease-out forwards; }
+            .dot-anim-1 { animation: dotFloat1 2.4s ease-out forwards; animation-delay: 0.1s; }
+            .dot-anim-2 { animation: dotFloat2 2.2s ease-out forwards; animation-delay: 0.3s; }
+            .dot-anim-3 { animation: dotFloat3 2.5s ease-out forwards; animation-delay: 0.0s; }
+            .dot-anim-4 { animation: dotFloat1 2.0s ease-out forwards; animation-delay: 0.5s; }
+            .dot-anim-5 { animation: dotFloat2 2.3s ease-out forwards; animation-delay: 0.2s; }
+            .dot-anim-6 { animation: dotFloat3 2.1s ease-out forwards; animation-delay: 0.4s; }
+          `}</style>
+          {/* 犬（中央下から浮かび上がる） */}
+          <div className="dog-anim absolute" style={{ bottom: '20%', left: '50%', transform: 'translateX(-50%)' }}>
+            <FluffyDog />
+          </div>
+          {/* 白い水玉 */}
+          <div className="dot-anim-1 absolute w-5 h-5 bg-white rounded-full opacity-90" style={{ bottom: '18%', left: '30%' }} />
+          <div className="dot-anim-2 absolute w-3 h-3 bg-white rounded-full opacity-80" style={{ bottom: '22%', left: '65%' }} />
+          <div className="dot-anim-3 absolute w-6 h-6 bg-white rounded-full opacity-85" style={{ bottom: '15%', left: '45%' }} />
+          <div className="dot-anim-4 absolute w-4 h-4 bg-white rounded-full opacity-90" style={{ bottom: '25%', left: '20%' }} />
+          <div className="dot-anim-5 absolute w-5 h-5 bg-white rounded-full opacity-80" style={{ bottom: '12%', left: '75%' }} />
+          <div className="dot-anim-6 absolute w-3 h-3 bg-white rounded-full opacity-85" style={{ bottom: '30%', left: '55%' }} />
+          <div className="dot-anim-1 absolute w-4 h-4 bg-white rounded-full opacity-75" style={{ bottom: '20%', left: '82%' }} />
+          <div className="dot-anim-2 absolute w-6 h-6 bg-white rounded-full opacity-80" style={{ bottom: '18%', left: '12%' }} />
+        </div>
+      )}
       {/* タイトル */}
       <h3 className="text-base font-black text-purple-900 tracking-wide mb-3 text-center">
         本当のことを言うとこんなに予約しました
@@ -177,8 +267,9 @@ export function ReservationCounter() {
       )}
 
       {/* 追い予約メモ */}
-      <p className="text-xs text-purple-400 text-center mb-4">
-        追い予約した人は最初に入れた枚数を消して合計枚数を入れなおしてOKです！
+      <p className="text-xs text-gray-700 text-center mb-4 font-medium">
+        ▼追い予約した人▼<br/>
+        前に入力した枚数を削除して合計枚数入れなおしてもOKです！
       </p>
 
       {/* 入力フォーム */}
