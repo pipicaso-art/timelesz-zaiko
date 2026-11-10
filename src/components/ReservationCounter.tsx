@@ -75,9 +75,26 @@ const PIXEL_COLORS: Record<number, string> = {
   1: '#FFCC99', 2: '#8B5CF6', 3: '#1A1A1A', 4: '#222222', 5: '#1E3A6E', 6: '#CC3333',
 };
 
-// お祝いドット絵キャラがウロウロするcanvasオーバーレイ
-const CELEB_SHIRTS = ['#8B5CF6','#EC4899','#06B6D4','#22C55E','#EF4444','#84CC16','#D1D5DB'];
-const CELEB_COLORS: Record<number,string> = { 1:'#FFCC99', 3:'#1A1A1A', 4:'#222222', 5:'#1E3A6E', 6:'#CC3333' };
+// お祝いドット絵キャラがウロウロするcanvasオーバーレイ（7人＋星）
+const CELEB_CHARS = [
+  { shirt: '#EF4444', hair: '#2D1B00', scale: 7  }, // 赤
+  { shirt: '#8B5CF6', hair: '#1A1A1A', scale: 7  }, // 紫
+  { shirt: '#06B6D4', hair: '#1A1A1A', scale: 7  }, // 水色
+  { shirt: '#22C55E', hair: '#1A1A1A', scale: 7  }, // 緑
+  { shirt: '#84CC16', hair: '#1A1A1A', scale: 7  }, // 黄緑
+  { shirt: '#D1D5DB', hair: '#FFD700', scale: 10 }, // 白（大きい・金髪）
+  { shirt: '#EC4899', hair: '#1A1A1A', scale: 7  }, // ピンク
+];
+const STAR_FRAME_CELEB = [
+  [0,0,0,1,0,0,0],
+  [0,0,1,1,1,0,0],
+  [1,1,1,1,1,1,1],
+  [0,1,1,1,1,1,0],
+  [0,0,1,1,1,0,0],
+  [0,1,0,0,0,1,0],
+  [1,0,0,0,0,0,1],
+];
+const STAR_CYCLE = ['#FFD700','#FFF176','#FFE55C','#FFFFFF','#FFD700','#FFE55C'];
 
 function CelebrationOverlay() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -91,27 +108,55 @@ function CelebrationOverlay() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const SCALE = 7;
-    const CW = 10 * SCALE;
-    const CH = 13 * SCALE;
     const duration = 2700;
+    const STAR_PIX = 6;
+    const STAR_PX_W = 7 * STAR_PIX;
+    const STAR_PX_H = 7 * STAR_PIX;
 
-    const chars = Array.from({ length: 5 }, (_, i) => ({
-      x: Math.random() * Math.max(W - CW, 1),
-      y: H * (0.15 + (i % 4) * 0.18),
-      dx: (Math.random() > 0.5 ? 1 : -1) * (2.5 + Math.random() * 2),
-      dy: (Math.random() > 0.5 ? 1 : -1) * 0.6,
-      shirt: CELEB_SHIRTS[i % CELEB_SHIRTS.length],
-      animF: 0,
-      animT: 0,
-    }));
+    const chars = CELEB_CHARS.map((cfg, i) => {
+      const cw = 10 * cfg.scale;
+      const ch = 13 * cfg.scale;
+      return {
+        x: Math.random() * Math.max(W - cw, 1),
+        y: H * (0.1 + (i % 5) * 0.16),
+        dx: (Math.random() > 0.5 ? 1 : -1) * (2 + Math.random() * 2),
+        dy: (Math.random() > 0.5 ? 1 : -1) * 0.6,
+        shirt: cfg.shirt,
+        hair: cfg.hair,
+        scale: cfg.scale,
+        cw, ch,
+        animF: 0,
+        animT: 0,
+      };
+    });
 
-    function drawChar(x: number, y: number, shirt: string, frame: number) {
+    const star = {
+      x: Math.random() * Math.max(W - STAR_PX_W, 1),
+      y: Math.random() * Math.max(H - STAR_PX_H, 1),
+      dx: (Math.random() > 0.5 ? 1 : -1) * (2 + Math.random() * 1.5),
+      dy: (Math.random() > 0.5 ? 1 : -1) * 1.2,
+      colorF: 0,
+      colorT: 0,
+    };
+
+    function drawChar(x: number, y: number, shirt: string, hair: string, scale: number, frame: number) {
       const grid = frame === 0 ? PIXEL_FRAME : PIXEL_FRAME2;
+      const colors: Record<number,string> = {
+        1: '#FFCC99', 2: shirt, 3: hair, 4: '#222222', 5: '#1E3A6E', 6: '#CC3333',
+      };
       grid.forEach((row, r) => row.forEach((v, c) => {
         if (v === 0) return;
-        ctx!.fillStyle = v === 2 ? shirt : (CELEB_COLORS[v] ?? '#000');
-        ctx!.fillRect(x + c * SCALE, y + r * SCALE, SCALE, SCALE);
+        ctx!.fillStyle = colors[v] ?? '#000';
+        ctx!.fillRect(x + c * scale, y + r * scale, scale, scale);
+      }));
+    }
+
+    function drawStar(x: number, y: number, colorIdx: number) {
+      const color = STAR_CYCLE[colorIdx % STAR_CYCLE.length];
+      STAR_FRAME_CELEB.forEach((row, r) => row.forEach((v, c) => {
+        if (v === 0) return;
+        ctx!.fillStyle = color;
+        ctx!.fillRect(x + c * STAR_PIX, y + r * STAR_PIX, STAR_PIX, STAR_PIX);
       }));
     }
 
@@ -122,7 +167,6 @@ function CelebrationOverlay() {
     function animate(now: number) {
       const elapsed = now - startTime;
       if (elapsed >= duration) { ctx!.clearRect(0, 0, W, H); return; }
-
       const dt = now - lastT; lastT = now;
       ctx!.clearRect(0, 0, W, H);
       ctx!.globalAlpha = elapsed > duration - 700
@@ -135,11 +179,21 @@ function CelebrationOverlay() {
         ch.x += ch.dx;
         ch.y += ch.dy;
         if (ch.x < 0) { ch.x = 0; ch.dx = Math.abs(ch.dx); }
-        if (ch.x > W - CW) { ch.x = W - CW; ch.dx = -Math.abs(ch.dx); }
+        if (ch.x > W - ch.cw) { ch.x = W - ch.cw; ch.dx = -Math.abs(ch.dx); }
         if (ch.y < 0) { ch.y = 0; ch.dy = Math.abs(ch.dy); }
-        if (ch.y > H - CH) { ch.y = H - CH; ch.dy = -Math.abs(ch.dy); }
-        drawChar(Math.round(ch.x), Math.round(ch.y), ch.shirt, ch.animF);
+        if (ch.y > H - ch.ch) { ch.y = H - ch.ch; ch.dy = -Math.abs(ch.dy); }
+        drawChar(Math.round(ch.x), Math.round(ch.y), ch.shirt, ch.hair, ch.scale, ch.animF);
       });
+
+      star.colorT += dt;
+      if (star.colorT > 120) { star.colorT = 0; star.colorF = (star.colorF + 1) % STAR_CYCLE.length; }
+      star.x += star.dx;
+      star.y += star.dy;
+      if (star.x < 0) { star.x = 0; star.dx = Math.abs(star.dx); }
+      if (star.x > W - STAR_PX_W) { star.x = W - STAR_PX_W; star.dx = -Math.abs(star.dx); }
+      if (star.y < 0) { star.y = 0; star.dy = Math.abs(star.dy); }
+      if (star.y > H - STAR_PX_H) { star.y = H - STAR_PX_H; star.dy = -Math.abs(star.dy); }
+      drawStar(Math.round(star.x), Math.round(star.y), star.colorF);
 
       rafId = requestAnimationFrame(animate);
     }
