@@ -77,6 +77,13 @@
   <button class="btn-blue" onclick="loadVisitStats()" style="padding:6px 12px;">🔄 更新</button>
 </div>
 
+<!-- 予約アクション数 -->
+<h2>📋 予約アクション数（ボタン押下）</h2>
+<div class="add-form" style="align-items:flex-start; gap:16px; flex-direction:column;">
+  <div id="actionStats" style="font-size:13px; color:#666;">読み込み中...</div>
+  <button class="btn-blue" onclick="loadActionStats()" style="padding:6px 12px;">🔄 更新</button>
+</div>
+
 <!-- 売上枚数更新 -->
 <h2>📊 売上枚数を更新</h2>
 <div class="add-form" style="align-items:center; gap:16px;">
@@ -645,6 +652,7 @@ async function bulkAutoFetch() {
 loadStores();
 loadSalesCount();
 loadVisitStats();
+loadActionStats();
 
 async function loadVisitStats() {
   const el = document.getElementById('visitStats');
@@ -686,6 +694,72 @@ async function loadVisitStats() {
     `;
   } catch(e) {
     el.textContent = '❌ 取得失敗: ' + e.message;
+  }
+}
+
+async function loadActionStats() {
+  const el = document.getElementById('actionStats');
+  el.textContent = '読み込み中...';
+  try {
+    // 累計（予約・削除）
+    const [resRes, delRes] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/reservation_actions?select=id&action=eq.reserve`, {
+        headers: { ...HEADERS, 'Prefer': 'count=exact' }
+      }),
+      fetch(`${SUPABASE_URL}/rest/v1/reservation_actions?select=id&action=eq.delete`, {
+        headers: { ...HEADERS, 'Prefer': 'count=exact' }
+      }),
+    ]);
+    const reserveTotal = (resRes.headers.get('content-range') || '').split('/')[1] || '0';
+    const deleteTotal  = (delRes.headers.get('content-range') || '').split('/')[1] || '0';
+
+    // 日別（直近14日）
+    const since = new Date(Date.now() - 14*24*60*60*1000).toISOString();
+    const recentRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/reservation_actions?select=action,created_at&created_at=gte.${since}&order=created_at.desc&limit=5000`,
+      { headers: HEADERS }
+    );
+    const recent = await recentRes.json();
+
+    // 日別集計（JST）
+    const byDay = {};
+    (Array.isArray(recent) ? recent : []).forEach(v => {
+      const jst = new Date(new Date(v.created_at).getTime() + 9*60*60*1000);
+      const day = jst.toISOString().slice(0, 10);
+      if (!byDay[day]) byDay[day] = { reserve: 0, delete: 0 };
+      byDay[day][v.action] = (byDay[day][v.action] || 0) + 1;
+    });
+
+    const days = Object.keys(byDay).sort().reverse().slice(0, 10);
+    const tableRows = days.map(d =>
+      `<tr>
+        <td style="padding:2px 12px 2px 0">${d}</td>
+        <td style="font-weight:bold;color:#27ae60;padding:2px 12px 2px 0">${(byDay[d].reserve||0).toLocaleString()}人</td>
+        <td style="font-weight:bold;color:#e74c3c">${(byDay[d].delete||0).toLocaleString()}人</td>
+      </tr>`
+    ).join('');
+
+    el.innerHTML = `
+      <div style="display:flex;gap:24px;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="font-size:15px;font-weight:bold;color:#2c3e50">
+          予約ボタン押した人数: <span style="font-size:20px;color:#27ae60">${parseInt(reserveTotal).toLocaleString()}人</span>
+        </div>
+        <div style="font-size:15px;font-weight:bold;color:#2c3e50">
+          削除ボタン押した人数: <span style="font-size:20px;color:#e74c3c">${parseInt(deleteTotal).toLocaleString()}人</span>
+        </div>
+      </div>
+      <table style="font-size:13px;border-collapse:collapse">
+        <tr>
+          <th style="text-align:left;padding:2px 12px 6px 0;color:#666;font-weight:normal">日付</th>
+          <th style="text-align:left;padding:2px 12px 6px 0;color:#27ae60;font-weight:normal">予約</th>
+          <th style="text-align:left;padding:2px 0 6px 0;color:#e74c3c;font-weight:normal">削除</th>
+        </tr>
+        ${tableRows || '<tr><td colspan="3" style="color:#999">データなし</td></tr>'}
+      </table>
+      <div style="margin-top:8px;font-size:11px;color:#999">※「予約した！」「削除する」ボタンが押された回数（累計）</div>
+    `;
+  } catch(e) {
+    el.innerHTML = `❌ 取得失敗: ${e.message}<br><span style="font-size:11px;color:#999">Supabaseに reservation_actions テーブルが必要です。supabase/action_logs.sql を実行してください。</span>`;
   }
 }
 

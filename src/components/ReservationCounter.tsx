@@ -133,8 +133,8 @@ function CelebrationOverlay() {
     const star = {
       x: Math.random() * Math.max(W - STAR_PX_W, 1),
       y: Math.random() * Math.max(H - STAR_PX_H, 1),
-      dx: (Math.random() > 0.5 ? 1 : -1) * (2 + Math.random() * 1.5),
-      dy: (Math.random() > 0.5 ? 1 : -1) * 1.2,
+      dx: (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 6),
+      dy: (Math.random() > 0.5 ? 1 : -1) * (7 + Math.random() * 5),
       colorF: 0,
       colorT: 0,
     };
@@ -189,10 +189,10 @@ function CelebrationOverlay() {
       if (star.colorT > 120) { star.colorT = 0; star.colorF = (star.colorF + 1) % STAR_CYCLE.length; }
       star.x += star.dx;
       star.y += star.dy;
-      if (star.x < 0) { star.x = 0; star.dx = Math.abs(star.dx); }
-      if (star.x > W - STAR_PX_W) { star.x = W - STAR_PX_W; star.dx = -Math.abs(star.dx); }
-      if (star.y < 0) { star.y = 0; star.dy = Math.abs(star.dy); }
-      if (star.y > H - STAR_PX_H) { star.y = H - STAR_PX_H; star.dy = -Math.abs(star.dy); }
+      if (star.x < 0) { star.x = 0; star.dx = (7 + Math.random() * 7); }
+      if (star.x > W - STAR_PX_W) { star.x = W - STAR_PX_W; star.dx = -(7 + Math.random() * 7); }
+      if (star.y < 0) { star.y = 0; star.dy = (6 + Math.random() * 6); }
+      if (star.y > H - STAR_PX_H) { star.y = H - STAR_PX_H; star.dy = -(6 + Math.random() * 6); }
       drawStar(Math.round(star.x), Math.round(star.y), star.colorF);
 
       rafId = requestAnimationFrame(animate);
@@ -290,6 +290,12 @@ export function ReservationCounter() {
         sessionStorage.setItem('reservation_submission', JSON.stringify(submission));
         setMySubmission(submission);
       }
+      // アクションログ記録（サイレント）
+      fetch(`${SUPABASE_URL}/rest/v1/reservation_actions`, {
+        method: 'POST',
+        headers: { ...SUPABASE_HEADERS, Prefer: 'return=minimal' },
+        body: JSON.stringify({ action: 'reserve' }),
+      }).catch(() => {});
       setSubmitted(true);
       setQuoteIndex(Math.floor(Math.random() * FUMA_QUOTES.length));
       setShowCelebration(true);
@@ -332,6 +338,12 @@ export function ReservationCounter() {
         });
         setDeleteCount('');
       }
+      // アクションログ記録（サイレント）
+      fetch(`${SUPABASE_URL}/rest/v1/reservation_actions`, {
+        method: 'POST',
+        headers: { ...SUPABASE_HEADERS, Prefer: 'return=minimal' },
+        body: JSON.stringify({ action: 'delete' }),
+      }).catch(() => {});
       await load();
     } catch {
       setError('削除に失敗しました');
