@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const ANON_KEY    = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+import { SUPABASE_URL, SUPABASE_HEADERS } from '@/lib/supabase';
 
 export function VisitTracker() {
   useEffect(() => {
@@ -15,11 +13,7 @@ export function VisitTracker() {
 
     fetch(`${SUPABASE_URL}/rest/v1/visits`, {
       method: 'POST',
-      headers: {
-        'apikey': ANON_KEY,
-        'Authorization': `Bearer ${ANON_KEY}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { ...SUPABASE_HEADERS, Prefer: 'return=minimal' },
       body: JSON.stringify({ session_id: sessionId }),
     }).catch(() => {/* サイレントに失敗 */});
   }, []);
