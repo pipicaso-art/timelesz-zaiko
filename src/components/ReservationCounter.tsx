@@ -249,27 +249,46 @@ export function ReservationCounter() {
 
   async function load() {
     try {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/reservations?select=id,count&order=count.desc&limit=10000`,
+      // top3・合計は count.desc で取得
+      const topRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/reservations?select=id,count&order=count.desc&limit=1000`,
         { headers: SUPABASE_HEADERS }
       );
-      const data: ReservationRow[] = await res.json();
-      if (!Array.isArray(data)) return;
+      const topData: ReservationRow[] = await topRes.json();
+      if (!Array.isArray(topData)) return;
+      setTop3(topData.slice(0, 3).map(r => r.count));
 
-      const sum = data.reduce((s, r) => s + r.count, 0);
-      setTotal(sum);
-      setTop3(data.slice(0, 3).map(r => r.count));
+      // 分布・合計はバケットごとに集計（件数だけ取得してrow limit回避）
+      const bucketCounts = await Promise.all(BUCKETS.map(async bucket => {
+        let url = `${SUPABASE_URL}/rest/v1/reservations?select=id&count=gte.${bucket.min}`;
+        if (bucket.max !== Infinity) url += `&count=lte.${bucket.max}`;
+        const r = await fetch(url, { headers: { ...SUPABASE_HEADERS, Prefer: 'count=exact' } });
+        const range = r.headers.get('content-range') || '';
+        return parseInt(range.split('/')[1] || '0');
+      }));
 
-      // 分布計算（v2）
-      const totalEntries = data.length;
-      if (totalEntries > 0) {
-        const dist: BucketResult[] = BUCKETS.map(bucket => {
-          const cnt = data.filter(r => r.count >= bucket.min && r.count <= bucket.max).length;
-          const pct = Math.round((cnt / totalEntries) * 1000) / 10; // 小数点1桁
-          return { label: bucket.label, count: cnt, pct };
-        });
-        setDistribution(dist);
+      const totalEntries = bucketCounts.reduce((s, c) => s + c, 0);
+      const dist: BucketResult[] = BUCKETS.map((bucket, i) => {
+        const cnt = bucketCounts[i];
+        const pct = totalEntries > 0 ? Math.round((cnt / totalEntries) * 1000) / 10 : 0;
+        return { label: bucket.label, count: cnt, pct };
+      });
+      setDistribution(dist);
+
+      // 合計枚数は全件fetchして合算（分けて取得）
+      let page = 0, sum = 0;
+      while (true) {
+        const r = await fetch(
+          `${SUPABASE_URL}/rest/v1/reservations?select=count&limit=1000&offset=${page * 1000}`,
+          { headers: SUPABASE_HEADERS }
+        );
+        const rows: ReservationRow[] = await r.json();
+        if (!Array.isArray(rows) || rows.length === 0) break;
+        sum += rows.reduce((s, row) => s + row.count, 0);
+        if (rows.length < 1000) break;
+        page++;
       }
+      setTotal(sum);
     } catch {}
   }
 
