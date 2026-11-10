@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { SUPABASE_URL, SUPABASE_HEADERS } from '@/lib/supabase';
 
-function FluffyDog() {
+function _FluffyDog_unused() {
   return (
     <svg viewBox="0 0 120 132" width="120" height="132" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -152,9 +152,103 @@ const PIXEL_FRAME = [
   [0,0,4,4,0,0,4,4,0,0],
   [0,0,0,0,0,0,0,0,0,0],
 ];
+// ウォークフレーム2（足を広げたポーズ）
+const PIXEL_FRAME2 = [
+  [0,0,3,3,3,3,3,3,0,0],
+  [0,3,3,3,3,3,3,3,3,0],
+  [3,1,1,1,1,1,1,1,1,3],
+  [1,1,1,4,1,1,4,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1],
+  [1,1,6,6,6,6,6,6,1,1],
+  [1,1,1,1,1,1,1,1,1,1],
+  [0,2,2,2,2,2,2,2,2,0],
+  [2,2,2,2,2,2,2,2,2,2],
+  [0,2,2,2,2,2,2,2,2,0],
+  [0,5,5,0,0,0,0,5,5,0],
+  [0,4,4,0,0,0,0,4,4,0],
+  [0,0,0,0,0,0,0,0,0,0],
+];
+
 const PIXEL_COLORS: Record<number, string> = {
   1: '#FFCC99', 2: '#8B5CF6', 3: '#1A1A1A', 4: '#222222', 5: '#1E3A6E', 6: '#CC3333',
 };
+
+// お祝いドット絵キャラがウロウロするcanvasオーバーレイ
+const CELEB_SHIRTS = ['#8B5CF6','#EC4899','#06B6D4','#22C55E','#EF4444','#84CC16','#D1D5DB'];
+const CELEB_COLORS: Record<number,string> = { 1:'#FFCC99', 3:'#1A1A1A', 4:'#222222', 5:'#1E3A6E', 6:'#CC3333' };
+
+function CelebrationOverlay() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const SCALE = 7;
+    const CW = 10 * SCALE;
+    const CH = 13 * SCALE;
+    const duration = 2700;
+
+    const chars = Array.from({ length: 5 }, (_, i) => ({
+      x: Math.random() * Math.max(W - CW, 1),
+      y: H * (0.15 + (i % 4) * 0.18),
+      dx: (Math.random() > 0.5 ? 1 : -1) * (2.5 + Math.random() * 2),
+      dy: (Math.random() > 0.5 ? 1 : -1) * 0.6,
+      shirt: CELEB_SHIRTS[i % CELEB_SHIRTS.length],
+      animF: 0,
+      animT: 0,
+    }));
+
+    function drawChar(x: number, y: number, shirt: string, frame: number) {
+      const grid = frame === 0 ? PIXEL_FRAME : PIXEL_FRAME2;
+      grid.forEach((row, r) => row.forEach((v, c) => {
+        if (v === 0) return;
+        ctx!.fillStyle = v === 2 ? shirt : (CELEB_COLORS[v] ?? '#000');
+        ctx!.fillRect(x + c * SCALE, y + r * SCALE, SCALE, SCALE);
+      }));
+    }
+
+    const startTime = performance.now();
+    let lastT = startTime;
+    let rafId: number;
+
+    function animate(now: number) {
+      const elapsed = now - startTime;
+      if (elapsed >= duration) { ctx!.clearRect(0, 0, W, H); return; }
+
+      const dt = now - lastT; lastT = now;
+      ctx!.clearRect(0, 0, W, H);
+      ctx!.globalAlpha = elapsed > duration - 700
+        ? Math.max(0, 1 - (elapsed - (duration - 700)) / 700)
+        : 1;
+
+      chars.forEach(ch => {
+        ch.animT += dt;
+        if (ch.animT > 170) { ch.animT = 0; ch.animF = 1 - ch.animF; }
+        ch.x += ch.dx;
+        ch.y += ch.dy;
+        if (ch.x < 0) { ch.x = 0; ch.dx = Math.abs(ch.dx); }
+        if (ch.x > W - CW) { ch.x = W - CW; ch.dx = -Math.abs(ch.dx); }
+        if (ch.y < 0) { ch.y = 0; ch.dy = Math.abs(ch.dy); }
+        if (ch.y > H - CH) { ch.y = H - CH; ch.dy = -Math.abs(ch.dy); }
+        drawChar(Math.round(ch.x), Math.round(ch.y), ch.shirt, ch.animF);
+      });
+
+      rafId = requestAnimationFrame(animate);
+    }
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
+  }, []);
+
+  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-50" style={{ imageRendering: 'pixelated' }} />;
+}
+
 function FumaPixelChar({ scale = 2 }: { scale?: number }) {
   const rects: JSX.Element[] = [];
   PIXEL_FRAME.forEach((row, r) =>
@@ -295,53 +389,7 @@ export function ReservationCounter() {
   return (
     <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4 mb-4 relative">
       {/* お祝いアニメーション */}
-      {showCelebration && (
-        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
-          <style>{`
-            @keyframes dogFloat {
-              0%   { transform: translateY(100px) scale(0.8); opacity: 0; }
-              15%  { opacity: 1; }
-              60%  { transform: translateY(-80px) scale(1.1); opacity: 1; }
-              100% { transform: translateY(-160px) scale(1); opacity: 0; }
-            }
-            @keyframes dotFloat1 {
-              0%   { transform: translateY(0) scale(0); opacity: 0; }
-              10%  { opacity: 0.9; transform: translateY(0) scale(1); }
-              100% { transform: translateY(-220px) scale(0.6); opacity: 0; }
-            }
-            @keyframes dotFloat2 {
-              0%   { transform: translateY(0) scale(0); opacity: 0; }
-              15%  { opacity: 0.8; transform: translateY(0) scale(1); }
-              100% { transform: translateY(-180px) scale(0.5); opacity: 0; }
-            }
-            @keyframes dotFloat3 {
-              0%   { transform: translateY(0) scale(0); opacity: 0; }
-              20%  { opacity: 0.9; transform: translateY(0) scale(1); }
-              100% { transform: translateY(-200px) scale(0.4); opacity: 0; }
-            }
-            .dog-anim { animation: dogFloat 2.6s ease-out forwards; }
-            .dot-anim-1 { animation: dotFloat1 2.4s ease-out forwards; animation-delay: 0.1s; }
-            .dot-anim-2 { animation: dotFloat2 2.2s ease-out forwards; animation-delay: 0.3s; }
-            .dot-anim-3 { animation: dotFloat3 2.5s ease-out forwards; animation-delay: 0.0s; }
-            .dot-anim-4 { animation: dotFloat1 2.0s ease-out forwards; animation-delay: 0.5s; }
-            .dot-anim-5 { animation: dotFloat2 2.3s ease-out forwards; animation-delay: 0.2s; }
-            .dot-anim-6 { animation: dotFloat3 2.1s ease-out forwards; animation-delay: 0.4s; }
-          `}</style>
-          {/* 犬（中央下から浮かび上がる） */}
-          <div className="dog-anim absolute" style={{ bottom: '20%', left: '50%', transform: 'translateX(-50%)' }}>
-            <FluffyDog />
-          </div>
-          {/* 白い水玉 */}
-          <div className="dot-anim-1 absolute w-5 h-5 bg-white rounded-full opacity-90" style={{ bottom: '18%', left: '30%' }} />
-          <div className="dot-anim-2 absolute w-3 h-3 bg-white rounded-full opacity-80" style={{ bottom: '22%', left: '65%' }} />
-          <div className="dot-anim-3 absolute w-6 h-6 bg-white rounded-full opacity-85" style={{ bottom: '15%', left: '45%' }} />
-          <div className="dot-anim-4 absolute w-4 h-4 bg-white rounded-full opacity-90" style={{ bottom: '25%', left: '20%' }} />
-          <div className="dot-anim-5 absolute w-5 h-5 bg-white rounded-full opacity-80" style={{ bottom: '12%', left: '75%' }} />
-          <div className="dot-anim-6 absolute w-3 h-3 bg-white rounded-full opacity-85" style={{ bottom: '30%', left: '55%' }} />
-          <div className="dot-anim-1 absolute w-4 h-4 bg-white rounded-full opacity-75" style={{ bottom: '20%', left: '82%' }} />
-          <div className="dot-anim-2 absolute w-6 h-6 bg-white rounded-full opacity-80" style={{ bottom: '18%', left: '12%' }} />
-        </div>
-      )}
+      {showCelebration && <CelebrationOverlay />}
       {/* タイトル */}
       <h3 className="text-base font-black text-purple-900 tracking-wide mb-3 text-center">
         本当のことを言うとこんなに予約しました
