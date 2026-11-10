@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { SUPABASE_URL, SUPABASE_HEADERS } from '@/lib/supabase';
 
 interface ReservationRow {
@@ -152,7 +152,7 @@ function CelebrationOverlay() {
 }
 
 function FumaPixelChar({ scale = 2 }: { scale?: number }) {
-  const rects: JSX.Element[] = [];
+  const rects: React.ReactElement[] = [];
   PIXEL_FRAME.forEach((row, r) =>
     row.forEach((v, c) => {
       if (v === 0) return;
