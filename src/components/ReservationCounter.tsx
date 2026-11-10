@@ -3,104 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { SUPABASE_URL, SUPABASE_HEADERS } from '@/lib/supabase';
 
-function _FluffyDog_unused() {
-  return (
-    <svg viewBox="0 0 120 132" width="120" height="132" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        {/* gooフィルター：円を滑らかに溶け合わせてふわふわシルエットを作る */}
-        <filter id="dogGoo" x="-25%" y="-25%" width="150%" height="150%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
-          <feColorMatrix in="blur" mode="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -11" result="goo"/>
-          <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
-        </filter>
-        <style>{`
-          @keyframes dogTongue {
-            0%,100% { transform: scaleY(1) translateY(0px); }
-            40%      { transform: scaleY(1.22) translateY(1px); }
-            70%      { transform: scaleY(0.95) translateY(-0.5px); }
-          }
-          @keyframes dogEarL {
-            0%,100% { transform: rotate(0deg); }
-            35%      { transform: rotate(-9deg); }
-            65%      { transform: rotate(6deg); }
-          }
-          @keyframes dogEarR {
-            0%,100% { transform: rotate(0deg); }
-            35%      { transform: rotate(9deg); }
-            65%      { transform: rotate(-6deg); }
-          }
-          .dg-tongue { transform-origin: 60px 67px; animation: dogTongue 0.65s ease-in-out infinite; }
-          .dg-ear-l  { transform-origin: 24px 50px; animation: dogEarL 1.0s ease-in-out infinite; }
-          .dg-ear-r  { transform-origin: 96px 50px; animation: dogEarR 1.0s ease-in-out infinite 0.12s; }
-        `}</style>
-      </defs>
-
-      {/* ===== ふわふわ本体（gooフィルターで溶け合い） ===== */}
-      <g filter="url(#dogGoo)">
-        {/* 耳（左）：アニメあり */}
-        <g className="dg-ear-l">
-          <circle cx="16" cy="56" r="13" fill="#ffffff"/>
-          <circle cx="11" cy="45" r="12" fill="#ffffff"/>
-          <circle cx="20" cy="38" r="12" fill="#ffffff"/>
-        </g>
-        {/* 耳（右）：アニメあり */}
-        <g className="dg-ear-r">
-          <circle cx="104" cy="56" r="13" fill="#ffffff"/>
-          <circle cx="109" cy="45" r="12" fill="#ffffff"/>
-          <circle cx="100" cy="38" r="12" fill="#ffffff"/>
-        </g>
-        {/* 頭クラウドバンプ（上）*/}
-        <circle cx="38"  cy="22" r="17" fill="#ffffff"/>
-        <circle cx="60"  cy="16" r="19" fill="#ffffff"/>
-        <circle cx="82"  cy="22" r="17" fill="#ffffff"/>
-        {/* 頭クラウドバンプ（横）*/}
-        <circle cx="28"  cy="40" r="16" fill="#ffffff"/>
-        <circle cx="92"  cy="40" r="16" fill="#ffffff"/>
-        {/* 頭メイン */}
-        <circle cx="60"  cy="52" r="30" fill="#ffffff"/>
-        {/* 胴体 */}
-        <circle cx="60" cy="102" r="25" fill="#ffffff"/>
-        <circle cx="40"  cy="98" r="17" fill="#ffffff"/>
-        <circle cx="80"  cy="98" r="17" fill="#ffffff"/>
-        {/* 前足 */}
-        <circle cx="42" cy="119" r="15" fill="#ffffff"/>
-        <circle cx="78" cy="119" r="15" fill="#ffffff"/>
-        <circle cx="60" cy="121" r="13" fill="#ffffff"/>
-      </g>
-
-      {/* ===== 毛並みテクスチャ（goo外・自然な線） ===== */}
-      <path d="M 44 78 Q 60 83 76 78"   stroke="#cac1bb" strokeWidth="0.9" fill="none" strokeLinecap="round"/>
-      <path d="M 37 68 Q 33 76 32 88"   stroke="#cac1bb" strokeWidth="0.9" fill="none" strokeLinecap="round"/>
-      <path d="M 83 68 Q 87 76 88 88"   stroke="#cac1bb" strokeWidth="0.9" fill="none" strokeLinecap="round"/>
-      <path d="M 48 93 Q 60 97 72 93"   stroke="#cac1bb" strokeWidth="0.8" fill="none" strokeLinecap="round"/>
-      <path d="M 40 108 Q 40 115 42 120" stroke="#cac1bb" strokeWidth="0.8" fill="none" strokeLinecap="round"/>
-      <path d="M 80 108 Q 80 115 78 120" stroke="#cac1bb" strokeWidth="0.8" fill="none" strokeLinecap="round"/>
-
-      {/* ===== 顔パーツ ===== */}
-      {/* 目 */}
-      <circle cx="50" cy="50" r="4.5" fill="#000000"/>
-      <circle cx="70" cy="50" r="4.5" fill="#000000"/>
-      <circle cx="51.5" cy="48.3" r="1.6" fill="white"/>
-      <circle cx="71.5" cy="48.3" r="1.6" fill="white"/>
-      {/* 鼻 */}
-      <ellipse cx="60" cy="58" rx="3.8" ry="2.8" fill="#2a1414"/>
-      {/* 口 */}
-      <path d="M 54 62 Q 57.5 66 60 65 Q 62.5 66 66 62"
-        stroke="#2a1414" strokeWidth="1.3" fill="none" strokeLinecap="round"/>
-      {/* ベロ（アニメあり） */}
-      <g className="dg-tongue">
-        <ellipse cx="60" cy="68.5" rx="4.5" ry="3.8" fill="#f09aaa"/>
-        <line x1="60" y1="65" x2="60" y2="72" stroke="#e08898" strokeWidth="1.0" strokeLinecap="round"/>
-      </g>
-
-      {/* ===== ピンクハート ===== */}
-      <path d="M 101 15 C 101 13 99 11 97 13 C 95 11 93 13 93 15 C 93 18 97 21 97 21 C 97 21 101 18 101 15 Z" fill="#f4b0c2"/>
-      <path d="M 112 23 C 112 21.5 110.5 20 109 21.5 C 107.5 20 106 21.5 106 23 C 106 25.5 109 28 109 28 C 109 28 112 25.5 112 23 Z" fill="#f4b0c2"/>
-    </svg>
-  );
-}
-
 interface ReservationRow {
   id: string;
   count: number;
@@ -215,7 +117,7 @@ function CelebrationOverlay() {
 
     const startTime = performance.now();
     let lastT = startTime;
-    let rafId: number;
+    let rafId = 0;
 
     function animate(now: number) {
       const elapsed = now - startTime;
