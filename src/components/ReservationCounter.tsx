@@ -232,6 +232,10 @@ export function ReservationCounter() {
   const celebrationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    // セッションID生成（ブラウザセッション中は同じIDを使い回す）
+    if (!sessionStorage.getItem('rsv_session_id')) {
+      sessionStorage.setItem('rsv_session_id', Math.random().toString(36).slice(2) + Date.now().toString(36));
+    }
     const stored = sessionStorage.getItem('reservation_submission');
     if (stored) {
       try {
@@ -278,10 +282,11 @@ export function ReservationCounter() {
     setError('');
     setLoading(true);
     try {
+      const sessionId = sessionStorage.getItem('rsv_session_id') ?? undefined;
       const res = await fetch(`${SUPABASE_URL}/rest/v1/reservations`, {
         method: 'POST',
         headers: { ...SUPABASE_HEADERS, Prefer: 'return=representation' },
-        body: JSON.stringify({ count: n }),
+        body: JSON.stringify({ count: n, session_id: sessionId }),
       });
       const data = await res.json();
       const newId = Array.isArray(data) ? data[0]?.id : data?.id;

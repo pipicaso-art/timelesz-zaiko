@@ -77,6 +77,13 @@
   <button class="btn-blue" onclick="loadVisitStats()" style="padding:6px 12px;">🔄 更新</button>
 </div>
 
+<!-- 100枚以上の申告 -->
+<h2>🔍 100枚以上の申告（いたずら調査）</h2>
+<div class="add-form" style="align-items:flex-start; gap:16px; flex-direction:column;">
+  <div id="largeEntries" style="font-size:13px; color:#666;">読み込み中...</div>
+  <button class="btn-blue" onclick="loadLargeEntries()" style="padding:6px 12px;">🔄 更新</button>
+</div>
+
 <!-- 予約アクション数 -->
 <h2>📋 予約アクション数（ボタン押下）</h2>
 <div class="add-form" style="align-items:flex-start; gap:16px; flex-direction:column;">
@@ -653,6 +660,7 @@ loadStores();
 loadSalesCount();
 loadVisitStats();
 loadActionStats();
+loadLargeEntries();
 
 async function loadVisitStats() {
   const el = document.getElementById('visitStats');
@@ -695,6 +703,69 @@ async function loadVisitStats() {
   } catch(e) {
     el.textContent = '❌ 取得失敗: ' + e.message;
   }
+}
+
+async function loadLargeEntries() {
+  const el = document.getElementById('largeEntries');
+  el.textContent = '読み込み中...';
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/reservations?count=gte.100&select=id,count,session_id,created_at&order=count.desc&limit=50`,
+      { headers: HEADERS }
+    );
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      el.textContent = '100枚以上の申告はありません';
+      return;
+    }
+
+    // session_idの重複チェック
+    const sessionCounts = {};
+    data.forEach(r => { if (r.session_id) sessionCounts[r.session_id] = (sessionCounts[r.session_id] || 0) + 1; });
+
+    const rows = data.map(r => {
+      const jst = new Date(new Date(r.created_at).getTime() + 9*60*60*1000);
+      const dateStr = jst.toISOString().slice(0, 16).replace('T', ' ');
+      const isDup = r.session_id && sessionCounts[r.session_id] > 1;
+      const sidDisplay = r.session_id
+        ? `<span style="font-family:monospace;font-size:11px;color:${isDup ? '#e74c3c' : '#888'}">${r.session_id.slice(0, 12)}…${isDup ? ' ⚠️ 重複' : ''}</span>`
+        : `<span style="color:#bbb;font-size:11px">未記録</span>`;
+      return `<tr style="${isDup ? 'background:#fff0f0' : ''}">
+        <td style="padding:4px 10px">${r.count}枚</td>
+        <td style="padding:4px 10px;font-size:12px">${dateStr}</td>
+        <td style="padding:4px 10px">${sidDisplay}</td>
+        <td style="padding:4px 6px">
+          <button onclick="deleteEntry('${r.id}')" style="background:#e74c3c;color:white;border:none;border-radius:3px;padding:2px 8px;cursor:pointer;font-size:12px">削除</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div style="margin-bottom:8px;color:#555">${data.length}件 / 100枚以上の申告一覧</div>
+      <table style="font-size:13px;border-collapse:collapse;background:white;border-radius:6px;overflow:hidden">
+        <tr style="background:#2c3e50;color:white">
+          <th style="padding:6px 10px;text-align:left">枚数</th>
+          <th style="padding:6px 10px;text-align:left">投稿日時（JST）</th>
+          <th style="padding:6px 10px;text-align:left">セッションID（先頭12文字）</th>
+          <th style="padding:6px 10px"></th>
+        </tr>
+        ${rows}
+      </table>
+      <div style="margin-top:8px;font-size:11px;color:#999">⚠️赤は同じセッションIDが複数回 / 「未記録」は新機能導入前の投稿</div>
+    `;
+  } catch(e) {
+    el.textContent = '❌ 取得失敗: ' + e.message;
+  }
+}
+
+async function deleteEntry(id) {
+  if (!confirm('この申告を削除しますか？')) return;
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/reservations?id=eq.${id}`, {
+    method: 'DELETE',
+    headers: HEADERS
+  });
+  if (res.ok) { loadLargeEntries(); }
+  else { alert('削除失敗'); }
 }
 
 async function loadActionStats() {
