@@ -91,6 +91,13 @@
   <button class="btn-blue" onclick="loadActionStats()" style="padding:6px 12px;">🔄 更新</button>
 </div>
 
+<!-- 枚数別分布 -->
+<h2>📊 枚数別分布（申告人数）</h2>
+<div class="add-form" style="align-items:flex-start; gap:16px; flex-direction:column;">
+  <div id="distStats" style="font-size:13px; color:#666;">読み込み中...</div>
+  <button class="btn-blue" onclick="loadDistribution()" style="padding:6px 12px;">🔄 更新</button>
+</div>
+
 <!-- 売上枚数更新 -->
 <h2>📊 売上枚数を更新</h2>
 <div class="add-form" style="align-items:center; gap:16px;">
@@ -661,6 +668,7 @@ loadSalesCount();
 loadVisitStats();
 loadActionStats();
 loadLargeEntries();
+loadDistribution();
 
 async function loadVisitStats() {
   const el = document.getElementById('visitStats');
@@ -831,6 +839,84 @@ async function loadActionStats() {
     `;
   } catch(e) {
     el.innerHTML = `❌ 取得失敗: ${e.message}<br><span style="font-size:11px;color:#999">Supabaseに reservation_actions テーブルが必要です。supabase/action_logs.sql を実行してください。</span>`;
+  }
+}
+
+async function loadDistribution() {
+  const el = document.getElementById('distStats');
+  el.textContent = '読み込み中...';
+  try {
+    const BUCKETS = [
+      { label: '1枚',       min: 1,    max: 1    },
+      { label: '2枚',       min: 2,    max: 2    },
+      { label: '3枚',       min: 3,    max: 3    },
+      { label: '4〜9枚',   min: 4,    max: 9    },
+      { label: '10〜49枚', min: 10,   max: 49   },
+      { label: '50〜99枚', min: 50,   max: 99   },
+      { label: '100〜299枚',min: 100, max: 299  },
+      { label: '300〜499枚',min: 300, max: 499  },
+      { label: '500〜799枚',min: 500, max: 799  },
+      { label: '800〜999枚',min: 800, max: 999  },
+      { label: '1000枚以上',min: 1000, max: null },
+    ];
+
+    // バケット別件数（count=exactで行数上限なし）
+    const bucketCounts = await Promise.all(BUCKETS.map(async b => {
+      let url = `${SUPABASE_URL}/rest/v1/reservations?select=id&count=gte.${b.min}`;
+      if (b.max !== null) url += `&count=lte.${b.max}`;
+      const r = await fetch(url, { headers: { ...HEADERS, 'Prefer': 'count=exact' } });
+      const range = r.headers.get('content-range') || '';
+      return parseInt(range.split('/')[1] || '0');
+    }));
+
+    const totalEntries = bucketCounts.reduce((s, c) => s + c, 0);
+
+    // 合計枚数（ページング）
+    let page = 0, totalSheets = 0;
+    while (true) {
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/reservations?select=count&limit=1000&offset=${page * 1000}`, { headers: HEADERS });
+      const rows = await r.json();
+      if (!Array.isArray(rows) || rows.length === 0) break;
+      totalSheets += rows.reduce((s, row) => s + row.count, 0);
+      if (rows.length < 1000) break;
+      page++;
+    }
+
+    const rows = BUCKETS.map((b, i) => {
+      const cnt = bucketCounts[i];
+      const pct = totalEntries > 0 ? (cnt / totalEntries * 100).toFixed(1) : '0.0';
+      const barW = Math.round(parseFloat(pct) * 2); // max 200px
+      return `<tr>
+        <td style="padding:4px 12px 4px 0;white-space:nowrap">${b.label}</td>
+        <td style="padding:4px 12px 4px 0;text-align:right;font-weight:bold;color:#2c3e50">${cnt.toLocaleString()}人</td>
+        <td style="padding:4px 12px 4px 0;text-align:right;color:#666">${pct}%</td>
+        <td style="padding:4px 0;min-width:200px">
+          <div style="background:#27ae60;height:14px;border-radius:3px;width:${barW}px;min-width:${cnt>0?2:0}px"></div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div style="display:flex;gap:24px;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="font-size:15px;font-weight:bold;color:#2c3e50">
+          総申告人数: <span style="font-size:20px;color:#27ae60">${totalEntries.toLocaleString()}人</span>
+        </div>
+        <div style="font-size:15px;font-weight:bold;color:#2c3e50">
+          総申告枚数: <span style="font-size:20px;color:#3498db">${totalSheets.toLocaleString()}枚</span>
+        </div>
+      </div>
+      <table style="font-size:13px;border-collapse:collapse">
+        <tr>
+          <th style="text-align:left;padding:2px 12px 6px 0;color:#666;font-weight:normal">枚数</th>
+          <th style="text-align:right;padding:2px 12px 6px 0;color:#666;font-weight:normal">人数</th>
+          <th style="text-align:right;padding:2px 12px 6px 0;color:#666;font-weight:normal">割合</th>
+          <th style="padding:2px 0 6px 0;color:#666;font-weight:normal"></th>
+        </tr>
+        ${rows}
+      </table>
+    `;
+  } catch(e) {
+    el.textContent = '❌ 取得失敗: ' + e.message;
   }
 }
 
