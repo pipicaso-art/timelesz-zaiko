@@ -8,9 +8,12 @@ export default function HomePage() {
     <main className="max-w-7xl mx-auto px-4 py-6 flex gap-6">
       <div className="flex-1 min-w-0 space-y-6">
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <p className="text-sm font-bold text-gray-900 tracking-widest mb-3">
-            2027.02.03 RELEASE &nbsp;/&nbsp; SINGLE
-          </p>
+          <div className="flex justify-between items-start mb-3">
+            <p className="text-sm font-bold text-gray-900 tracking-widest">
+              2027.02.03 RELEASE &nbsp;/&nbsp; SINGLE
+            </p>
+            <ReleaseCountdown />
+          </div>
           <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mb-1">ザユウノメイ /</h1>
           <p className="text-3xl sm:text-4xl font-black text-gray-900 mb-2">本当のことを言うと</p>
           <p className="text-base italic text-gray-500 mb-4">timelesz</p>
@@ -20,7 +23,6 @@ export default function HomePage() {
             className="inline-flex items-center gap-2 bg-purple-50 border border-purple-200 hover:bg-purple-100 text-purple-700 text-sm font-bold px-4 py-2 rounded-full transition-colors mb-4">
             🎵 「本当のことを言うと」先行配信中
           </a>
-          <ReleaseCountdown />
           <SalesProgress />
           <p className="text-xs text-gray-400 mt-2 text-center">※3形態同時予約購入特典あり（詳細後日解禁）</p>
           <p className="text-xs text-gray-400 mt-1 text-center">※FC会員限定盤は受注生産限定（予約期間：〜2026/12/21）</p>

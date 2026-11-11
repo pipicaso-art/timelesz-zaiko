@@ -489,27 +489,31 @@ export function ReservationCounter() {
       {error && <p className="text-xs text-red-500 mt-2 text-center">{error}</p>}
 
       {/* 分布図 */}
-      {distribution.some(b => b.count > 0) && (
-        <div className="mt-4 border-t border-purple-100 pt-3">
-          <p className="text-xs font-bold text-purple-700 mb-2">📊 予約枚数の分布</p>
-          <div className="space-y-1.5">
-            {distribution.map((b) => (
-              <div key={b.label} className="flex items-center gap-2">
-                <span className="text-xs text-gray-500 w-24 shrink-0 text-right">{b.label}</span>
-                <div className="flex-1 h-2.5 bg-purple-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-purple-400 rounded-full transition-all"
-                    style={{ width: b.count === 0 ? '0%' : `${Math.max((b.pct / maxPct) * 100, 4)}%` }}
-                  />
+      {distribution.some(b => b.count > 0) && (() => {
+        const firstNonZero = distribution.findIndex(b => b.count > 0);
+        const visibleDist = firstNonZero >= 0 ? distribution.slice(firstNonZero) : distribution;
+        return (
+          <div className="mt-4 border-t border-purple-100 pt-3">
+            <p className="text-xs font-bold text-purple-700 mb-2">予約枚数の分布</p>
+            <div className="space-y-1.5">
+              {visibleDist.map((b) => (
+                <div key={b.label} className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500 w-24 shrink-0 text-right">{b.label}</span>
+                  <div className="flex-1 h-2.5 bg-purple-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-purple-400 rounded-full transition-all"
+                      style={{ width: b.count === 0 ? '0%' : `${Math.max((b.pct / maxPct) * 100, 4)}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-bold text-purple-700 w-12 text-right">
+                    {b.count === 0 ? '0%' : b.pct < 0.1 ? '<0.1%' : `${b.pct}%`}
+                  </span>
                 </div>
-                <span className="text-xs font-bold text-purple-700 w-12 text-right">
-                  {b.count === 0 ? '0%' : b.pct < 0.1 ? '<0.1%' : `${b.pct}%`}
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

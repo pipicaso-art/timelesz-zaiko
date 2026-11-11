@@ -23,16 +23,16 @@ export function ReleaseCountdown() {
 
   if (daysUntil > 0) {
     return (
-      <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 mb-5">
-        <span className="text-emerald-700 font-black text-2xl">{daysUntil}</span>
-        <span className="text-emerald-600 text-sm">日後に発売</span>
+      <div className="text-right">
+        <span className="text-emerald-600 font-black text-2xl">{daysUntil}</span>
+        <span className="text-emerald-500 text-sm ml-1">日後に発売</span>
       </div>
     );
   }
 
   return (
-    <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 mb-5">
-      <span className="text-emerald-700 font-bold">🎉 発売中！</span>
+    <div className="text-right">
+      <span className="text-emerald-600 font-bold text-sm">🎉 発売中！</span>
     </div>
   );
 }
