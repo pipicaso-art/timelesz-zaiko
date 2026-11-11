@@ -506,7 +506,7 @@ export function ReservationCounter() {
                     />
                   </div>
                   <span className="text-xs font-bold text-purple-700 w-12 text-right">
-                    {b.count === 0 ? '0%' : b.pct < 0.1 ? '<0.1%' : `${b.pct}%`}
+                    {b.count === 0 ? '0.0%' : b.pct < 0.1 ? '<0.1%' : `${b.pct.toFixed(1)}%`}
                   </span>
                 </div>
               ))}
