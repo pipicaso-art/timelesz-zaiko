@@ -261,7 +261,13 @@ export function WelcomeCelebration() {
           className="text-white font-black"
           style={{
             writingMode: 'vertical-rl',
-            fontSize: '110px',
+            fontSize: [
+              '時間ないで',
+              '努力好きなんで',
+              'どんな壁も乗り越えます、絶対に。',
+              'よく寝たわ〜',
+              '変えよう、その方が早い',
+            ].includes(quote) ? '160px' : '110px',
             maxHeight: '5.5em',
             lineHeight: '1.1',
             textShadow: '0 0 32px rgba(255,220,100,1), 0 0 8px rgba(0,0,0,1)',
