@@ -10,6 +10,7 @@ const QUOTES = [
   '自信ないぐらいがちょうどいい',
   '僕が必ず背中押しますから',
   '人生につまらない日はないからね',
+  '殻破れよ！終わっちまうぞこんなんじゃ',
 ];
 
 const CELEB_CHARS = [
@@ -261,9 +262,6 @@ export function WelcomeCelebration() {
           }}
         >
           {quote}
-        </p>
-        <p className="text-purple-200 text-xs mt-5 opacity-70">
-          タップで閉じる
         </p>
       </div>
     </div>
