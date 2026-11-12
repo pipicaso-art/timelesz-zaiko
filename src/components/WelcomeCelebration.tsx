@@ -74,13 +74,14 @@ const DURATION = 5500;
 export function WelcomeCelebration() {
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-  const [quote] = useState(() => QUOTES[Math.floor(Math.random() * QUOTES.length)]);
+  const [quote, setQuote] = useState('');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dismissRef = useRef(false);
 
   useEffect(() => {
     if (sessionStorage.getItem('welcome_20k_shown')) return;
     sessionStorage.setItem('welcome_20k_shown', '1');
+    setQuote(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
     setVisible(true);
   }, []);
 
