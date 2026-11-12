@@ -1,5 +1,9 @@
 // Supabase REST API direct fetch helper (browser-safe, no SDK)
-export const SUPABASE_URL = 'https://mxplxvthjtxbxehigpki.supabase.co';
+// 本番環境では Cloudflare Pages Function のキャッシュプロキシ経由にしてエグレスを削減
+export const SUPABASE_URL =
+  typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+    ? `${window.location.origin}/supabase-proxy`
+    : 'https://mxplxvthjtxbxehigpki.supabase.co';
 export const SUPABASE_ANON_KEY = 'sb_publishable_P--sYozZCBfaRs06HPgaQQ_ipkFzEwq';
 
 export const SUPABASE_HEADERS = {
