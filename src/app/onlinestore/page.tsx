@@ -19,7 +19,7 @@ const ONLINE_STORES = [
   },
   {
     name: '楽天ブックス',
-    url: 'https://timelesz.lnk.to/270203',
+    url: 'https://rpx.a8.net/svt/ejp?a8mat=4BGJFV+6CMH2Q+2HOM+BW8O1&rakuten=y&a8ejpredirect=http%3A%2F%2Fhb.afl.rakuten.co.jp%2Fhgc%2F0eac8dc2.9a477d4e.0eac8dc3.0aa56a48%2Fa26111281490_4BGJFV_6CMH2Q_2HOM_BW8O1%3Fpc%3Dhttps%253A%252F%252Fbooks.rakuten.co.jp%252Fsearch%253Fsitem%253Dtimelesz%26m%3Dhttps%253A%252F%252Fbooks.rakuten.co.jp%252Fsearch%253Fsitem%253Dtimelesz',
     description: 'CD予約・通販',
     note: null,
     badge: null,
@@ -174,6 +174,9 @@ export default function OnlineStorePage() {
         <p className="text-gray-400 text-xs text-center">
           ※リンク先の在庫・予約状況は変動します。購入前に各サイトでご確認ください。
         </p>
+        {/* A8.net 楽天アフィリエイト トラッキングピクセル */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img border={0} width={1} height={1} src="https://www12.a8.net/0.gif?a8mat=4BGJFV+6CMH2Q+2HOM+BW8O1" alt="" />
       </div>
 
       <Sidebar />
