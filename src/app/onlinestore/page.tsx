@@ -176,7 +176,8 @@ export default function OnlineStorePage() {
         </p>
         {/* A8.net 楽天アフィリエイト トラッキングピクセル */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img border={0} width={1} height={1} src="https://www12.a8.net/0.gif?a8mat=4BGJFV+6CMH2Q+2HOM+BW8O1" alt="" />
+        {/* @ts-expect-error border is a valid HTML attribute */}
+        <img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4BGJFV+6CMH2Q+2HOM+BW8O1" alt="" />
       </div>
 
       <Sidebar />
