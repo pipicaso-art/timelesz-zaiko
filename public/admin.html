@@ -681,27 +681,24 @@ async function loadVisitStats() {
     const totalRange = totalRes.headers.get('content-range') || '';
     const total = totalRange.split('/')[1] || '?';
 
-    // 日別（直近10日）count=exactで1000件上限を回避
-    const dailyDays = [];
-    for (let i = 0; i < 10; i++) {
-      const d = new Date(Date.now() + 9*60*60*1000 - i*24*60*60*1000);
-      dailyDays.push(d.toISOString().slice(0, 10));
-    }
-    const dayCounts = await Promise.all(dailyDays.map(async day => {
-      const startUTC = new Date(day + 'T00:00:00+09:00').toISOString();
-      const endUTC   = new Date(day + 'T23:59:59.999+09:00').toISOString();
-      const r = await fetch(
-        `${SUPABASE_URL}/rest/v1/visits?select=id&created_at=gte.${startUTC}&created_at=lte.${endUTC}`,
-        { headers: { ...HEADERS, 'Prefer': 'count=exact' } }
-      );
-      const range = r.headers.get('content-range') || '';
-      return { day, count: parseInt(range.split('/')[1] || '0') };
-    }));
+    // 日別（直近14日）
+    const since = new Date(Date.now() - 14*24*60*60*1000).toISOString();
+    const recentRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/visits?select=created_at&created_at=gte.${since}&order=created_at.desc&limit=5000`,
+      { headers: HEADERS }
+    );
+    const recent = await recentRes.json();
 
-    const days = dailyDays;
-    const tableRows = dayCounts.filter(d => d.count > 0).map(d =>
-      `<tr><td style="padding:2px 12px 2px 0">${d.day}</td><td style="font-weight:bold;color:#2c3e50">${d.count.toLocaleString()}人</td></tr>`
-    ).join('');
+    // 日別集計（JST = UTC+9）
+    const byDay = {};
+    recent.forEach(v => {
+      const jst = new Date(new Date(v.created_at).getTime() + 9*60*60*1000);
+      const day = jst.toISOString().slice(0, 10);
+      byDay[day] = (byDay[day] || 0) + 1;
+    });
+
+    const days = Object.keys(byDay).sort().reverse().slice(0, 10);
+    const tableRows = days.map(d => `<tr><td style="padding:2px 12px 2px 0">${d}</td><td style="font-weight:bold;color:#2c3e50">${byDay[d].toLocaleString()}人</td></tr>`).join('');
 
     el.innerHTML = `
       <div style="margin-bottom:10px;font-size:15px;font-weight:bold;color:#2c3e50">累計訪問者数: <span style="font-size:20px;color:#27ae60">${parseInt(total).toLocaleString()}人</span></div>
@@ -795,36 +792,29 @@ async function loadActionStats() {
     const reserveTotal = (resRes.headers.get('content-range') || '').split('/')[1] || '0';
     const deleteTotal  = (delRes.headers.get('content-range') || '').split('/')[1] || '0';
 
-    // 日別（直近10日）count=exactで1000件上限を回避
-    const actionDays = [];
-    for (let i = 0; i < 10; i++) {
-      const d = new Date(Date.now() + 9*60*60*1000 - i*24*60*60*1000);
-      actionDays.push(d.toISOString().slice(0, 10));
-    }
-    const actionCounts = await Promise.all(actionDays.map(async day => {
-      const startUTC = new Date(day + 'T00:00:00+09:00').toISOString();
-      const endUTC   = new Date(day + 'T23:59:59.999+09:00').toISOString();
-      const [rRes, dRes] = await Promise.all([
-        fetch(`${SUPABASE_URL}/rest/v1/reservation_actions?select=id&action=eq.reserve&created_at=gte.${startUTC}&created_at=lte.${endUTC}`,
-          { headers: { ...HEADERS, 'Prefer': 'count=exact' } }),
-        fetch(`${SUPABASE_URL}/rest/v1/reservation_actions?select=id&action=eq.delete&created_at=gte.${startUTC}&created_at=lte.${endUTC}`,
-          { headers: { ...HEADERS, 'Prefer': 'count=exact' } }),
-      ]);
-      const rRange = rRes.headers.get('content-range') || '';
-      const dRange = dRes.headers.get('content-range') || '';
-      return {
-        day,
-        reserve: parseInt(rRange.split('/')[1] || '0'),
-        delete:  parseInt(dRange.split('/')[1] || '0'),
-      };
-    }));
+    // 日別（直近14日）
+    const since = new Date(Date.now() - 14*24*60*60*1000).toISOString();
+    const recentRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/reservation_actions?select=action,created_at&created_at=gte.${since}&order=created_at.desc&limit=5000`,
+      { headers: HEADERS }
+    );
+    const recent = await recentRes.json();
 
-    const days = actionDays;
-    const tableRows = actionCounts.filter(d => d.reserve > 0 || d.delete > 0).map(d =>
+    // 日別集計（JST）
+    const byDay = {};
+    (Array.isArray(recent) ? recent : []).forEach(v => {
+      const jst = new Date(new Date(v.created_at).getTime() + 9*60*60*1000);
+      const day = jst.toISOString().slice(0, 10);
+      if (!byDay[day]) byDay[day] = { reserve: 0, delete: 0 };
+      byDay[day][v.action] = (byDay[day][v.action] || 0) + 1;
+    });
+
+    const days = Object.keys(byDay).sort().reverse().slice(0, 10);
+    const tableRows = days.map(d =>
       `<tr>
-        <td style="padding:2px 12px 2px 0">${d.day}</td>
-        <td style="font-weight:bold;color:#27ae60;padding:2px 12px 2px 0">${d.reserve.toLocaleString()}人</td>
-        <td style="font-weight:bold;color:#e74c3c">${d.delete.toLocaleString()}人</td>
+        <td style="padding:2px 12px 2px 0">${d}</td>
+        <td style="font-weight:bold;color:#27ae60;padding:2px 12px 2px 0">${(byDay[d].reserve||0).toLocaleString()}人</td>
+        <td style="font-weight:bold;color:#e74c3c">${(byDay[d].delete||0).toLocaleString()}人</td>
       </tr>`
     ).join('');
 
